@@ -1,0 +1,2429 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-10-03T10:53:21.782923+00:00",
+  "mode": "bm25_only",
+  "top_k": 5,
+  "ranking": {
+    "candidate_k": 16,
+    "vector_weight": 0.65,
+    "bm25_weight": 0.35,
+    "rerank_enabled": true
+  },
+  "metrics": {
+    "evidence_hit_at_1": 0.5,
+    "evidence_hit_at_3": 0.8888888888888888,
+    "evidence_hit_at_5": 0.9444444444444444,
+    "mrr": 0.6805555555555556,
+    "source_hit_at_5": 1.0
+  },
+  "metrics_by_query_type": {
+    "lexical": {
+      "evidence_hit_at_1": 0.8333333333333334,
+      "evidence_hit_at_3": 1.0,
+      "evidence_hit_at_5": 1.0,
+      "mrr": 0.8888888888888888,
+      "source_hit_at_5": 1.0
+    },
+    "paraphrase": {
+      "evidence_hit_at_1": 0.6666666666666666,
+      "evidence_hit_at_3": 1.0,
+      "evidence_hit_at_5": 1.0,
+      "mrr": 0.8055555555555555,
+      "source_hit_at_5": 1.0
+    },
+    "method": {
+      "evidence_hit_at_1": 0.0,
+      "evidence_hit_at_3": 0.6666666666666666,
+      "evidence_hit_at_5": 0.8333333333333334,
+      "mrr": 0.34722222222222215,
+      "source_hit_at_5": 1.0
+    }
+  },
+  "cases": [
+    {
+      "case_id": "attention-scaling-factor",
+      "query": "What scaling factor is applied to query-key dot products before softmax?",
+      "query_type": "lexical",
+      "expected_source_id": "research:attention_pdf",
+      "expected_pages": [
+        4
+      ],
+      "expected_sections": [
+        "Page 4"
+      ],
+      "expected_evidence_anchors": [
+        "divide each by √dk",
+        "apply a softmax function"
+      ],
+      "resolved_expected_chunk_ids": [
+        24
+      ],
+      "backend": {
+        "vector_enabled": false,
+        "embedding_backend": null,
+        "embedding_model": null,
+        "chroma_query_used": false,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "first_expected_rank": 3,
+      "source_hit_at_5": true,
+      "top_5": [
+        {
+          "chunk_id": 25,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 4",
+          "symbol": "Page 4",
+          "qualified_symbol": "Page 4",
+          "final_rank": 1,
+          "final_score": 0.7216117982851914,
+          "bm25_score": 20.04314754181132,
+          "vector_score": null,
+          "fusion_score": 1.0,
+          "rerank_score": 0.7216117982851914,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 4,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 27,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 4",
+          "symbol": "Page 4",
+          "qualified_symbol": "Page 4",
+          "final_rank": 2,
+          "final_score": 0.65376026524445,
+          "bm25_score": 18.74176902954685,
+          "vector_score": null,
+          "fusion_score": 0.9040895551317438,
+          "rerank_score": 0.65376026524445,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 4,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 24,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 4",
+          "symbol": "Page 4",
+          "qualified_symbol": "Page 4",
+          "final_rank": 3,
+          "final_score": 0.5758536791142057,
+          "bm25_score": 16.968276374044677,
+          "vector_score": null,
+          "fusion_score": 0.7733847156428681,
+          "rerank_score": 0.5758536791142057,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 4,
+          "expected_evidence_match": true
+        },
+        {
+          "chunk_id": 23,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 4",
+          "symbol": "Page 4",
+          "qualified_symbol": "Page 4",
+          "final_rank": 4,
+          "final_score": 0.5509296504128202,
+          "bm25_score": 16.946974529303787,
+          "vector_score": null,
+          "fusion_score": 0.7718147885337612,
+          "rerank_score": 0.5509296504128202,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 4,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 44,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 6",
+          "symbol": "Page 6",
+          "qualified_symbol": "Page 6",
+          "final_rank": 5,
+          "final_score": 0.34026812758842107,
+          "bm25_score": 11.934330125056782,
+          "vector_score": null,
+          "fusion_score": 0.4023873312283922,
+          "rerank_score": 0.34026812758842107,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 6,
+          "expected_evidence_match": false
+        }
+      ]
+    },
+    {
+      "case_id": "attention-label-smoothing",
+      "query": "What label smoothing value was used during Transformer training?",
+      "query_type": "lexical",
+      "expected_source_id": "research:attention_pdf",
+      "expected_pages": [
+        8
+      ],
+      "expected_sections": [
+        "Page 8"
+      ],
+      "expected_evidence_anchors": [
+        "label smoothing of value ϵls = 0.1"
+      ],
+      "resolved_expected_chunk_ids": [
+        56
+      ],
+      "backend": {
+        "vector_enabled": false,
+        "embedding_backend": null,
+        "embedding_model": null,
+        "chroma_query_used": false,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "first_expected_rank": 1,
+      "source_hit_at_5": true,
+      "top_5": [
+        {
+          "chunk_id": 56,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 8",
+          "symbol": "Page 8",
+          "qualified_symbol": "Page 8",
+          "final_rank": 1,
+          "final_score": 0.7296880997567019,
+          "bm25_score": 24.749070705231645,
+          "vector_score": null,
+          "fusion_score": 1.0,
+          "rerank_score": 0.7296880997567019,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 8,
+          "expected_evidence_match": true
+        },
+        {
+          "chunk_id": 345,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 33",
+          "symbol": "Page 33",
+          "qualified_symbol": "Page 33",
+          "final_rank": 2,
+          "final_score": 0.3497247703682467,
+          "bm25_score": 14.256798779220683,
+          "vector_score": null,
+          "fusion_score": 0.40938600824580285,
+          "rerank_score": 0.3497247703682467,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 33,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 53,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 7",
+          "symbol": "Page 7",
+          "qualified_symbol": "Page 7",
+          "final_rank": 3,
+          "final_score": 0.22729542926318916,
+          "bm25_score": 10.794465888678307,
+          "vector_score": null,
+          "fusion_score": 0.21448996821889063,
+          "rerank_score": 0.22729542926318916,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 7,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 474,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 18",
+          "symbol": "Page 18",
+          "qualified_symbol": "Page 18",
+          "final_rank": 4,
+          "final_score": 0.2150714002561286,
+          "bm25_score": 10.509827519194523,
+          "vector_score": null,
+          "fusion_score": 0.19846756575041619,
+          "rerank_score": 0.2150714002561286,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 18,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 475,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 18",
+          "symbol": "Page 18",
+          "qualified_symbol": "Page 18",
+          "final_rank": 5,
+          "final_score": 0.18598959150543154,
+          "bm25_score": 9.6774352894676,
+          "vector_score": null,
+          "fusion_score": 0.1516118894039584,
+          "rerank_score": 0.18598959150543154,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 18,
+          "expected_evidence_match": false
+        }
+      ]
+    },
+    {
+      "case_id": "attention-position-order",
+      "query": "How does the Transformer represent token order despite having neither recurrence nor convolution?",
+      "query_type": "paraphrase",
+      "expected_source_id": "research:attention_pdf",
+      "expected_pages": [
+        6
+      ],
+      "expected_sections": [
+        "Page 6"
+      ],
+      "expected_evidence_anchors": [
+        "contains no recurrence and no convolution",
+        "order of the sequence"
+      ],
+      "resolved_expected_chunk_ids": [
+        39
+      ],
+      "backend": {
+        "vector_enabled": false,
+        "embedding_backend": null,
+        "embedding_model": null,
+        "chroma_query_used": false,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "first_expected_rank": 1,
+      "source_hit_at_5": true,
+      "top_5": [
+        {
+          "chunk_id": 39,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 6",
+          "symbol": "Page 6",
+          "qualified_symbol": "Page 6",
+          "final_rank": 1,
+          "final_score": 0.6659263329008352,
+          "bm25_score": 14.503818534921983,
+          "vector_score": null,
+          "fusion_score": 1.0,
+          "rerank_score": 0.6659263329008352,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 6,
+          "expected_evidence_match": true
+        },
+        {
+          "chunk_id": 224,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 14",
+          "symbol": "Page 14",
+          "qualified_symbol": "Page 14",
+          "final_rank": 2,
+          "final_score": 0.37174512374950464,
+          "bm25_score": 10.017897537259564,
+          "vector_score": null,
+          "fusion_score": 0.5231334054887543,
+          "rerank_score": 0.37174512374950464,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 14,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 16,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 2",
+          "symbol": "Page 2",
+          "qualified_symbol": "Page 2",
+          "final_rank": 3,
+          "final_score": 0.35897118351792323,
+          "bm25_score": 9.372538083216714,
+          "vector_score": null,
+          "fusion_score": 0.4545297976130432,
+          "rerank_score": 0.35897118351792323,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 2,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 12,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 2",
+          "symbol": "Page 2",
+          "qualified_symbol": "Page 2",
+          "final_rank": 4,
+          "final_score": 0.3583068237496897,
+          "bm25_score": 9.717344766985356,
+          "vector_score": null,
+          "fusion_score": 0.4911837621253808,
+          "rerank_score": 0.3583068237496897,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 2,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 359,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 2",
+          "symbol": "Page 2",
+          "qualified_symbol": "Page 2",
+          "final_rank": 5,
+          "final_score": 0.30926255395922025,
+          "bm25_score": 8.917341076267409,
+          "vector_score": null,
+          "fusion_score": 0.40614101710426037,
+          "rerank_score": 0.30926255395922025,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 2,
+          "expected_evidence_match": false
+        }
+      ]
+    },
+    {
+      "case_id": "attention-sinusoidal-encoding",
+      "query": "Which fixed functions encode positions at different frequencies?",
+      "query_type": "paraphrase",
+      "expected_source_id": "research:attention_pdf",
+      "expected_pages": [
+        6
+      ],
+      "expected_sections": [
+        "Page 6"
+      ],
+      "expected_evidence_anchors": [
+        "use sine and cosine functions of different frequencies"
+      ],
+      "resolved_expected_chunk_ids": [
+        40
+      ],
+      "backend": {
+        "vector_enabled": false,
+        "embedding_backend": null,
+        "embedding_model": null,
+        "chroma_query_used": false,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "first_expected_rank": 1,
+      "source_hit_at_5": true,
+      "top_5": [
+        {
+          "chunk_id": 40,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 6",
+          "symbol": "Page 6",
+          "qualified_symbol": "Page 6",
+          "final_rank": 1,
+          "final_score": 0.7477933130850787,
+          "bm25_score": 18.105199054497085,
+          "vector_score": null,
+          "fusion_score": 1.0,
+          "rerank_score": 0.7477933130850787,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 6,
+          "expected_evidence_match": true
+        },
+        {
+          "chunk_id": 30,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 5",
+          "symbol": "Page 5",
+          "qualified_symbol": "Page 5",
+          "final_rank": 2,
+          "final_score": 0.36989112023087695,
+          "bm25_score": 11.761811298733349,
+          "vector_score": null,
+          "fusion_score": 0.4469439053953675,
+          "rerank_score": 0.36989112023087695,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 5,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 14,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 2",
+          "symbol": "Page 2",
+          "qualified_symbol": "Page 2",
+          "final_rank": 3,
+          "final_score": 0.3373132315765242,
+          "bm25_score": 11.161236972577878,
+          "vector_score": null,
+          "fusion_score": 0.3945820911516216,
+          "rerank_score": 0.3373132315765242,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 2,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 35,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 5",
+          "symbol": "Page 5",
+          "qualified_symbol": "Page 5",
+          "final_rank": 4,
+          "final_score": 0.2745986064013347,
+          "bm25_score": 9.297278122487672,
+          "vector_score": null,
+          "fusion_score": 0.2320705371010344,
+          "rerank_score": 0.2745986064013347,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 5,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 9,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 2",
+          "symbol": "Page 2",
+          "qualified_symbol": "Page 2",
+          "final_rank": 5,
+          "final_score": 0.258297090996493,
+          "bm25_score": 9.526476129591764,
+          "vector_score": null,
+          "fusion_score": 0.2520534483750579,
+          "rerank_score": 0.258297090996493,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 2,
+          "expected_evidence_match": false
+        }
+      ]
+    },
+    {
+      "case_id": "attention-multihead-combination",
+      "query": "How are the parallel attention heads combined, and how many heads does the base model use?",
+      "query_type": "method",
+      "expected_source_id": "research:attention_pdf",
+      "expected_pages": [
+        5
+      ],
+      "expected_sections": [
+        "Page 5"
+      ],
+      "expected_evidence_anchors": [
+        "MultiHead(Q, K, V) = Concat",
+        "h = 8 parallel attention layers"
+      ],
+      "resolved_expected_chunk_ids": [
+        31
+      ],
+      "backend": {
+        "vector_enabled": false,
+        "embedding_backend": null,
+        "embedding_model": null,
+        "chroma_query_used": false,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "first_expected_rank": 3,
+      "source_hit_at_5": true,
+      "top_5": [
+        {
+          "chunk_id": 95,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 15",
+          "symbol": "Page 15",
+          "qualified_symbol": "Page 15",
+          "final_rank": 1,
+          "final_score": 0.7274477855397914,
+          "bm25_score": 20.976278124360626,
+          "vector_score": null,
+          "fusion_score": 1.0,
+          "rerank_score": 0.7274477855397914,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 15,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 64,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 9",
+          "symbol": "Page 9",
+          "qualified_symbol": "Page 9",
+          "final_rank": 2,
+          "final_score": 0.6272197683824183,
+          "bm25_score": 18.57664312069443,
+          "vector_score": null,
+          "fusion_score": 0.7842495423590833,
+          "rerank_score": 0.6272197683824183,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 9,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 31,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 5",
+          "symbol": "Page 5",
+          "qualified_symbol": "Page 5",
+          "final_rank": 3,
+          "final_score": 0.6067146309009699,
+          "bm25_score": 18.147683244586,
+          "vector_score": null,
+          "fusion_score": 0.7456818895958137,
+          "rerank_score": 0.6067146309009699,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 5,
+          "expected_evidence_match": true
+        },
+        {
+          "chunk_id": 91,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 13",
+          "symbol": "Page 13",
+          "qualified_symbol": "Page 13",
+          "final_rank": 4,
+          "final_score": 0.5691562133923466,
+          "bm25_score": 18.071369321368124,
+          "vector_score": null,
+          "fusion_score": 0.7388205278330976,
+          "rerank_score": 0.5691562133923466,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 13,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 93,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 14",
+          "symbol": "Page 14",
+          "qualified_symbol": "Page 14",
+          "final_rank": 5,
+          "final_score": 0.4792989768123161,
+          "bm25_score": 16.345706848529094,
+          "vector_score": null,
+          "fusion_score": 0.5836667366607098,
+          "rerank_score": 0.4792989768123161,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 14,
+          "expected_evidence_match": false
+        }
+      ]
+    },
+    {
+      "case_id": "attention-encoder-sublayers",
+      "query": "What are the two encoder sub-layers and how are residual connections normalized?",
+      "query_type": "method",
+      "expected_source_id": "research:attention_pdf",
+      "expected_pages": [
+        3
+      ],
+      "expected_sections": [
+        "Page 3"
+      ],
+      "expected_evidence_anchors": [
+        "multi-head self-attention mechanism",
+        "fully connected feed-forward network",
+        "LayerNorm(x + Sublayer(x))"
+      ],
+      "resolved_expected_chunk_ids": [
+        19
+      ],
+      "backend": {
+        "vector_enabled": false,
+        "embedding_backend": null,
+        "embedding_model": null,
+        "chroma_query_used": false,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "first_expected_rank": 4,
+      "source_hit_at_5": true,
+      "top_5": [
+        {
+          "chunk_id": 20,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 3",
+          "symbol": "Page 3",
+          "qualified_symbol": "Page 3",
+          "final_rank": 1,
+          "final_score": 0.7661811730847782,
+          "bm25_score": 33.67077013728556,
+          "vector_score": null,
+          "fusion_score": 1.0,
+          "rerank_score": 0.7661811730847782,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 3,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 18,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 3",
+          "symbol": "Page 3",
+          "qualified_symbol": "Page 3",
+          "final_rank": 2,
+          "final_score": 0.4256858371619668,
+          "bm25_score": 19.089819276642736,
+          "vector_score": null,
+          "fusion_score": 0.41978347334461474,
+          "rerank_score": 0.4256858371619668,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 3,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 35,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 5",
+          "symbol": "Page 5",
+          "qualified_symbol": "Page 5",
+          "final_rank": 3,
+          "final_score": 0.38642910005120035,
+          "bm25_score": 17.158674855257864,
+          "vector_score": null,
+          "fusion_score": 0.34293787394887987,
+          "rerank_score": 0.38642910005120035,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 5,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 19,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 3",
+          "symbol": "Page 3",
+          "qualified_symbol": "Page 3",
+          "final_rank": 4,
+          "final_score": 0.3635682608835228,
+          "bm25_score": 17.604188106198926,
+          "vector_score": null,
+          "fusion_score": 0.36066608341275674,
+          "rerank_score": 0.3635682608835228,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 3,
+          "expected_evidence_match": true
+        },
+        {
+          "chunk_id": 95,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 15",
+          "symbol": "Page 15",
+          "qualified_symbol": "Page 15",
+          "final_rank": 5,
+          "final_score": 0.24594173073955347,
+          "bm25_score": 12.400561015482596,
+          "vector_score": null,
+          "fusion_score": 0.15359931078307457,
+          "rerank_score": 0.24594173073955347,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 15,
+          "expected_evidence_match": false
+        }
+      ]
+    },
+    {
+      "case_id": "react-four-benchmarks",
+      "query": "Which four benchmarks are used to evaluate ReAct?",
+      "query_type": "lexical",
+      "expected_source_id": "research:react_pdf",
+      "expected_pages": [
+        3
+      ],
+      "expected_sections": [
+        "Page 3"
+      ],
+      "expected_evidence_anchors": [
+        "four diverse benchmarks",
+        "HotPotQA",
+        "Fever",
+        "ALFWorld",
+        "WebShop"
+      ],
+      "resolved_expected_chunk_ids": [
+        113
+      ],
+      "backend": {
+        "vector_enabled": false,
+        "embedding_backend": null,
+        "embedding_model": null,
+        "chroma_query_used": false,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "first_expected_rank": 1,
+      "source_hit_at_5": true,
+      "top_5": [
+        {
+          "chunk_id": 113,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 3",
+          "symbol": "Page 3",
+          "qualified_symbol": "Page 3",
+          "final_rank": 1,
+          "final_score": 0.6430803571428572,
+          "bm25_score": 10.699053358497082,
+          "vector_score": null,
+          "fusion_score": 1.0,
+          "rerank_score": 0.6430803571428572,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 3,
+          "expected_evidence_match": true
+        },
+        {
+          "chunk_id": 153,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 6",
+          "symbol": "Page 6",
+          "qualified_symbol": "Page 6",
+          "final_rank": 2,
+          "final_score": 0.5475706969505629,
+          "bm25_score": 9.651640179904998,
+          "vector_score": null,
+          "fusion_score": 0.749169173312818,
+          "rerank_score": 0.5475706969505629,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 6,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 74,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 10",
+          "symbol": "Page 10",
+          "qualified_symbol": "Page 10",
+          "final_rank": 3,
+          "final_score": 0.43581663063715265,
+          "bm25_score": 8.594636600938241,
+          "vector_score": null,
+          "fusion_score": 0.49604167125109666,
+          "rerank_score": 0.43581663063715265,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 10,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 154,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 6",
+          "symbol": "Page 6",
+          "qualified_symbol": "Page 6",
+          "final_rank": 4,
+          "final_score": 0.35809305978350997,
+          "bm25_score": 8.535027837259019,
+          "vector_score": null,
+          "fusion_score": 0.4817667740309204,
+          "rerank_score": 0.35809305978350997,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 6,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 231,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 15",
+          "symbol": "Page 15",
+          "qualified_symbol": "Page 15",
+          "final_rank": 5,
+          "final_score": 0.33566364060788917,
+          "bm25_score": 7.783313922087969,
+          "vector_score": null,
+          "fusion_score": 0.30174896765954873,
+          "rerank_score": 0.33566364060788917,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 15,
+          "expected_evidence_match": false
+        }
+      ]
+    },
+    {
+      "case_id": "react-success-improvements",
+      "query": "What absolute success-rate improvements does ReAct report on ALFWorld and WebShop?",
+      "query_type": "lexical",
+      "expected_source_id": "research:react_pdf",
+      "expected_pages": [
+        1
+      ],
+      "expected_sections": [
+        "Page 1"
+      ],
+      "expected_evidence_anchors": [
+        "ALFWorld and WebShop",
+        "34% and 10% respectively"
+      ],
+      "resolved_expected_chunk_ids": [
+        101
+      ],
+      "backend": {
+        "vector_enabled": false,
+        "embedding_backend": null,
+        "embedding_model": null,
+        "chroma_query_used": false,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "first_expected_rank": 1,
+      "source_hit_at_5": true,
+      "top_5": [
+        {
+          "chunk_id": 101,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 1",
+          "symbol": "Page 1",
+          "qualified_symbol": "Page 1",
+          "final_rank": 1,
+          "final_score": 0.776057282551982,
+          "bm25_score": 23.842996226278217,
+          "vector_score": null,
+          "fusion_score": 1.0,
+          "rerank_score": 0.776057282551982,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 1,
+          "expected_evidence_match": true
+        },
+        {
+          "chunk_id": 115,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 3",
+          "symbol": "Page 3",
+          "qualified_symbol": "Page 3",
+          "final_rank": 2,
+          "final_score": 0.5011923637779794,
+          "bm25_score": 17.172454244077027,
+          "vector_score": null,
+          "fusion_score": 0.5610687984551957,
+          "rerank_score": 0.5011923637779794,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 3,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 170,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 8",
+          "symbol": "Page 8",
+          "qualified_symbol": "Page 8",
+          "final_rank": 3,
+          "final_score": 0.48537856090184556,
+          "bm25_score": 16.88345159734787,
+          "vector_score": null,
+          "fusion_score": 0.5420520110161942,
+          "rerank_score": 0.48537856090184556,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 8,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 393,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 6",
+          "symbol": "Page 6",
+          "qualified_symbol": "Page 6",
+          "final_rank": 4,
+          "final_score": 0.38192942960987497,
+          "bm25_score": 15.29793151572943,
+          "vector_score": null,
+          "fusion_score": 0.43772252229471703,
+          "rerank_score": 0.38192942960987497,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 6,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 454,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 14",
+          "symbol": "Page 14",
+          "qualified_symbol": "Page 14",
+          "final_rank": 5,
+          "final_score": 0.318553125135916,
+          "bm25_score": 14.09764235578437,
+          "vector_score": null,
+          "fusion_score": 0.3587417791134804,
+          "rerank_score": 0.318553125135916,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 14,
+          "expected_evidence_match": false
+        }
+      ]
+    },
+    {
+      "case_id": "react-hallucination-grounding",
+      "query": "How does ReAct reduce hallucination and error propagation in question answering?",
+      "query_type": "paraphrase",
+      "expected_source_id": "research:react_pdf",
+      "expected_pages": [
+        1
+      ],
+      "expected_sections": [
+        "Page 1"
+      ],
+      "expected_evidence_anchors": [
+        "hallucination and error propagation",
+        "interacting with a simple Wikipedia API"
+      ],
+      "resolved_expected_chunk_ids": [
+        100
+      ],
+      "backend": {
+        "vector_enabled": false,
+        "embedding_backend": null,
+        "embedding_model": null,
+        "chroma_query_used": false,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "first_expected_rank": 1,
+      "source_hit_at_5": true,
+      "top_5": [
+        {
+          "chunk_id": 100,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 1",
+          "symbol": "Page 1",
+          "qualified_symbol": "Page 1",
+          "final_rank": 1,
+          "final_score": 0.8037239543627918,
+          "bm25_score": 23.474206055229466,
+          "vector_score": null,
+          "fusion_score": 1.0,
+          "rerank_score": 0.8037239543627918,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 1,
+          "expected_evidence_match": true
+        },
+        {
+          "chunk_id": 108,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 2",
+          "symbol": "Page 2",
+          "qualified_symbol": "Page 2",
+          "final_rank": 2,
+          "final_score": 0.41986194014463707,
+          "bm25_score": 14.523542412823888,
+          "vector_score": null,
+          "fusion_score": 0.4412652704019839,
+          "rerank_score": 0.41986194014463707,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 2,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 146,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 6",
+          "symbol": "Page 6",
+          "qualified_symbol": "Page 6",
+          "final_rank": 3,
+          "final_score": 0.3739346107892561,
+          "bm25_score": 13.019986188090371,
+          "vector_score": null,
+          "fusion_score": 0.34740752820264537,
+          "rerank_score": 0.3739346107892561,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 6,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 336,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 32",
+          "symbol": "Page 32",
+          "qualified_symbol": "Page 32",
+          "final_rank": 4,
+          "final_score": 0.33624943910437394,
+          "bm25_score": 11.97955273678657,
+          "vector_score": null,
+          "fusion_score": 0.28245968452267406,
+          "rerank_score": 0.33624943910437394,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 32,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 344,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 33",
+          "symbol": "Page 33",
+          "qualified_symbol": "Page 33",
+          "final_rank": 5,
+          "final_score": 0.24502754905208934,
+          "bm25_score": 9.986794813248823,
+          "vector_score": null,
+          "fusion_score": 0.15806409732988755,
+          "rerank_score": 0.24502754905208934,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 33,
+          "expected_evidence_match": false
+        }
+      ]
+    },
+    {
+      "case_id": "react-reason-action-synergy",
+      "query": "Why does alternating reasoning with actions help both planning and information gathering?",
+      "query_type": "paraphrase",
+      "expected_source_id": "research:react_pdf",
+      "expected_pages": [
+        1
+      ],
+      "expected_sections": [
+        "Page 1"
+      ],
+      "expected_evidence_anchors": [
+        "reasoning traces help the model induce, track, and update action plans",
+        "gather additional information"
+      ],
+      "resolved_expected_chunk_ids": [
+        98
+      ],
+      "backend": {
+        "vector_enabled": false,
+        "embedding_backend": null,
+        "embedding_model": null,
+        "chroma_query_used": false,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "first_expected_rank": 1,
+      "source_hit_at_5": true,
+      "top_5": [
+        {
+          "chunk_id": 98,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 1",
+          "symbol": "Page 1",
+          "qualified_symbol": "Page 1",
+          "final_rank": 1,
+          "final_score": 0.7574766472841441,
+          "bm25_score": 18.741327453722768,
+          "vector_score": null,
+          "fusion_score": 1.0,
+          "rerank_score": 0.7574766472841441,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 1,
+          "expected_evidence_match": true
+        },
+        {
+          "chunk_id": 112,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 2",
+          "symbol": "Page 2",
+          "qualified_symbol": "Page 2",
+          "final_rank": 2,
+          "final_score": 0.4686991104769999,
+          "bm25_score": 13.590025004159717,
+          "vector_score": null,
+          "fusion_score": 0.5384190821990419,
+          "rerank_score": 0.4686991104769999,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 2,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 114,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 3",
+          "symbol": "Page 3",
+          "qualified_symbol": "Page 3",
+          "final_rank": 3,
+          "final_score": 0.33175193666493413,
+          "bm25_score": 11.095035232857967,
+          "vector_score": null,
+          "fusion_score": 0.314856268751901,
+          "rerank_score": 0.33175193666493413,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 3,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 204,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 11",
+          "symbol": "Page 11",
+          "qualified_symbol": "Page 11",
+          "final_rank": 4,
+          "final_score": 0.24899763807644484,
+          "bm25_score": 9.910901128677759,
+          "vector_score": null,
+          "fusion_score": 0.2087522859323176,
+          "rerank_score": 0.24899763807644484,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 11,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 116,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 3",
+          "symbol": "Page 3",
+          "qualified_symbol": "Page 3",
+          "final_rank": 5,
+          "final_score": 0.20145643513892791,
+          "bm25_score": 9.12851727104484,
+          "vector_score": null,
+          "fusion_score": 0.1386470139909488,
+          "rerank_score": 0.20145643513892791,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 3,
+          "expected_evidence_match": false
+        }
+      ]
+    },
+    {
+      "case_id": "react-dynamic-loop",
+      "query": "How does ReAct connect reasoning-to-action and action-to-reasoning in its interaction loop?",
+      "query_type": "method",
+      "expected_source_id": "research:react_pdf",
+      "expected_pages": [
+        2
+      ],
+      "expected_sections": [
+        "Page 2"
+      ],
+      "expected_evidence_anchors": [
+        "reason to act",
+        "act to reason",
+        "interleaved manner"
+      ],
+      "resolved_expected_chunk_ids": [
+        112
+      ],
+      "backend": {
+        "vector_enabled": false,
+        "embedding_backend": null,
+        "embedding_model": null,
+        "chroma_query_used": false,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "first_expected_rank": null,
+      "source_hit_at_5": true,
+      "top_5": [
+        {
+          "chunk_id": 225,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 14",
+          "symbol": "Page 14",
+          "qualified_symbol": "Page 14",
+          "final_rank": 1,
+          "final_score": 0.7555895799587704,
+          "bm25_score": 18.908415122650908,
+          "vector_score": null,
+          "fusion_score": 1.0,
+          "rerank_score": 0.7555895799587704,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 14,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 224,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 14",
+          "symbol": "Page 14",
+          "qualified_symbol": "Page 14",
+          "final_rank": 2,
+          "final_score": 0.5058672182261275,
+          "bm25_score": 15.392856074013302,
+          "vector_score": null,
+          "fusion_score": 0.5629726289595915,
+          "rerank_score": 0.5058672182261275,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 14,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 149,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 6",
+          "symbol": "Page 6",
+          "qualified_symbol": "Page 6",
+          "final_rank": 3,
+          "final_score": 0.44943552740529347,
+          "bm25_score": 14.465368568821704,
+          "vector_score": null,
+          "fusion_score": 0.44767448705416896,
+          "rerank_score": 0.44943552740529347,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 6,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 172,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 8",
+          "symbol": "Page 8",
+          "qualified_symbol": "Page 8",
+          "final_rank": 4,
+          "final_score": 0.3869831169283468,
+          "bm25_score": 13.908022444222627,
+          "vector_score": null,
+          "fusion_score": 0.3783894862269213,
+          "rerank_score": 0.3869831169283468,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 8,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 223,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 14",
+          "symbol": "Page 14",
+          "qualified_symbol": "Page 14",
+          "final_rank": 5,
+          "final_score": 0.36883445887518446,
+          "bm25_score": 13.749942808925768,
+          "vector_score": null,
+          "fusion_score": 0.35873823688847384,
+          "rerank_score": 0.36883445887518446,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 14,
+          "expected_evidence_match": false
+        }
+      ]
+    },
+    {
+      "case_id": "react-trajectory-components",
+      "query": "Which trajectory elements are generated by the model and which come from the environment?",
+      "query_type": "method",
+      "expected_source_id": "research:react_pdf",
+      "expected_pages": [
+        2
+      ],
+      "expected_sections": [
+        "Page 2"
+      ],
+      "expected_evidence_anchors": [
+        "generated by the model (Act, Thought)",
+        "environment (Obs)"
+      ],
+      "resolved_expected_chunk_ids": [
+        107
+      ],
+      "backend": {
+        "vector_enabled": false,
+        "embedding_backend": null,
+        "embedding_model": null,
+        "chroma_query_used": false,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "first_expected_rank": 2,
+      "source_hit_at_5": true,
+      "top_5": [
+        {
+          "chunk_id": 382,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 5",
+          "symbol": "Page 5",
+          "qualified_symbol": "Page 5",
+          "final_rank": 1,
+          "final_score": 0.7725152274861559,
+          "bm25_score": 13.522928382648187,
+          "vector_score": null,
+          "fusion_score": 1.0,
+          "rerank_score": 0.7725152274861559,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 5,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 107,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 2",
+          "symbol": "Page 2",
+          "qualified_symbol": "Page 2",
+          "final_rank": 2,
+          "final_score": 0.7115459423916973,
+          "bm25_score": 13.19164943349087,
+          "vector_score": null,
+          "fusion_score": 0.9112117783745145,
+          "rerank_score": 0.7115459423916973,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 2,
+          "expected_evidence_match": true
+        },
+        {
+          "chunk_id": 179,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 9",
+          "symbol": "Page 9",
+          "qualified_symbol": "Page 9",
+          "final_rank": 3,
+          "final_score": 0.6375269485805447,
+          "bm25_score": 12.945789007375515,
+          "vector_score": null,
+          "fusion_score": 0.845317129594703,
+          "rerank_score": 0.6375269485805447,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 9,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 173,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 8",
+          "symbol": "Page 8",
+          "qualified_symbol": "Page 8",
+          "final_rank": 4,
+          "final_score": 0.6145928311689658,
+          "bm25_score": 12.441907763495614,
+          "vector_score": null,
+          "fusion_score": 0.7102686465313001,
+          "rerank_score": 0.6145928311689658,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 8,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 383,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 5",
+          "symbol": "Page 5",
+          "qualified_symbol": "Page 5",
+          "final_rank": 5,
+          "final_score": 0.4770117804711693,
+          "bm25_score": 11.833716544317495,
+          "vector_score": null,
+          "fusion_score": 0.547263369871184,
+          "rerank_score": 0.4770117804711693,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 5,
+          "expected_evidence_match": false
+        }
+      ]
+    },
+    {
+      "case_id": "reflexion-three-models",
+      "query": "What three models make up the modular Reflexion formulation?",
+      "query_type": "lexical",
+      "expected_source_id": "research:reflexion_pdf",
+      "expected_pages": [
+        3
+      ],
+      "expected_sections": [
+        "Page 3"
+      ],
+      "expected_evidence_anchors": [
+        "three distinct models",
+        "an Actor",
+        "anEvaluator model",
+        "a Self-Reflection model"
+      ],
+      "resolved_expected_chunk_ids": [
+        371
+      ],
+      "backend": {
+        "vector_enabled": false,
+        "embedding_backend": null,
+        "embedding_model": null,
+        "chroma_query_used": false,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "first_expected_rank": 1,
+      "source_hit_at_5": true,
+      "top_5": [
+        {
+          "chunk_id": 371,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 3",
+          "symbol": "Page 3",
+          "qualified_symbol": "Page 3",
+          "final_rank": 1,
+          "final_score": 0.765291148201269,
+          "bm25_score": 19.018907734885534,
+          "vector_score": null,
+          "fusion_score": 1.0,
+          "rerank_score": 0.765291148201269,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 3,
+          "expected_evidence_match": true
+        },
+        {
+          "chunk_id": 104,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 1",
+          "symbol": "Page 1",
+          "qualified_symbol": "Page 1",
+          "final_rank": 2,
+          "final_score": 0.24708477408782983,
+          "bm25_score": 8.060289986861573,
+          "vector_score": null,
+          "fusion_score": 0.2153417201012695,
+          "rerank_score": 0.24708477408782983,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 1,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 160,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 7",
+          "symbol": "Page 7",
+          "qualified_symbol": "Page 7",
+          "final_rank": 3,
+          "final_score": 0.18881789295881332,
+          "bm25_score": 6.926899047472168,
+          "vector_score": null,
+          "fusion_score": 0.13418873115661376,
+          "rerank_score": 0.18881789295881332,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 7,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 148,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 6",
+          "symbol": "Page 6",
+          "qualified_symbol": "Page 6",
+          "final_rank": 4,
+          "final_score": 0.18482106284795735,
+          "bm25_score": 7.164160092225922,
+          "vector_score": null,
+          "fusion_score": 0.15117708201838426,
+          "rerank_score": 0.18482106284795735,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 6,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 477,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 18",
+          "symbol": "Page 18",
+          "qualified_symbol": "Page 18",
+          "final_rank": 5,
+          "final_score": 0.17962875184462165,
+          "bm25_score": 7.004977188655703,
+          "vector_score": null,
+          "fusion_score": 0.1397792774615809,
+          "rerank_score": 0.17962875184462165,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 18,
+          "expected_evidence_match": false
+        }
+      ]
+    },
+    {
+      "case_id": "reflexion-memory-types",
+      "query": "What serves as short-term memory and what is stored in long-term memory in Reflexion?",
+      "query_type": "lexical",
+      "expected_source_id": "research:reflexion_pdf",
+      "expected_pages": [
+        5
+      ],
+      "expected_sections": [
+        "Page 5"
+      ],
+      "expected_evidence_anchors": [
+        "trajectory history serves as the short-term memory",
+        "stored in long-term memory"
+      ],
+      "resolved_expected_chunk_ids": [
+        382
+      ],
+      "backend": {
+        "vector_enabled": false,
+        "embedding_backend": null,
+        "embedding_model": null,
+        "chroma_query_used": false,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "first_expected_rank": 1,
+      "source_hit_at_5": true,
+      "top_5": [
+        {
+          "chunk_id": 382,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 5",
+          "symbol": "Page 5",
+          "qualified_symbol": "Page 5",
+          "final_rank": 1,
+          "final_score": 0.8448344909227177,
+          "bm25_score": 41.27336439958281,
+          "vector_score": null,
+          "fusion_score": 1.0,
+          "rerank_score": 0.8448344909227177,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 5,
+          "expected_evidence_match": true
+        },
+        {
+          "chunk_id": 381,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 4",
+          "symbol": "Page 4",
+          "qualified_symbol": "Page 4",
+          "final_rank": 2,
+          "final_score": 0.647875512956164,
+          "bm25_score": 33.28983792344563,
+          "vector_score": null,
+          "fusion_score": 0.7436311688736833,
+          "rerank_score": 0.647875512956164,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 4,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 357,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 2",
+          "symbol": "Page 2",
+          "qualified_symbol": "Page 2",
+          "final_rank": 3,
+          "final_score": 0.4655492556933887,
+          "bm25_score": 23.765515937173475,
+          "vector_score": null,
+          "fusion_score": 0.4377839593492145,
+          "rerank_score": 0.4655492556933887,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 2,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 78,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 11",
+          "symbol": "Page 11",
+          "qualified_symbol": "Page 11",
+          "final_rank": 4,
+          "final_score": 0.4561583905562976,
+          "bm25_score": 23.515142729567252,
+          "vector_score": null,
+          "fusion_score": 0.42974391754923896,
+          "rerank_score": 0.4561583905562976,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 11,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 8,
+          "source_id": "research:attention_pdf",
+          "file_path": "attention-is-all-you-need.pdf",
+          "section": "Page 2",
+          "symbol": "Page 2",
+          "qualified_symbol": "Page 2",
+          "final_rank": 5,
+          "final_score": 0.4370129220003153,
+          "bm25_score": 22.346101366211734,
+          "vector_score": null,
+          "fusion_score": 0.3922033934766261,
+          "rerank_score": 0.4370129220003153,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Attention Is All You Need",
+          "page": 2,
+          "expected_evidence_match": false
+        }
+      ]
+    },
+    {
+      "case_id": "reflexion-feedback-conversion",
+      "query": "How is a sparse success or failure signal turned into guidance for the next episode?",
+      "query_type": "paraphrase",
+      "expected_source_id": "research:reflexion_pdf",
+      "expected_pages": [
+        2
+      ],
+      "expected_sections": [
+        "Page 2"
+      ],
+      "expected_evidence_anchors": [
+        "converts binary or scalar feedback",
+        "textual summary",
+        "next episode"
+      ],
+      "resolved_expected_chunk_ids": [
+        354
+      ],
+      "backend": {
+        "vector_enabled": false,
+        "embedding_backend": null,
+        "embedding_model": null,
+        "chroma_query_used": false,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "first_expected_rank": 2,
+      "source_hit_at_5": true,
+      "top_5": [
+        {
+          "chunk_id": 379,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 4",
+          "symbol": "Page 4",
+          "qualified_symbol": "Page 4",
+          "final_rank": 1,
+          "final_score": 0.7322763410625497,
+          "bm25_score": 15.359442424993244,
+          "vector_score": null,
+          "fusion_score": 1.0,
+          "rerank_score": 0.7322763410625497,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 4,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 354,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 2",
+          "symbol": "Page 2",
+          "qualified_symbol": "Page 2",
+          "final_rank": 2,
+          "final_score": 0.6736638351213876,
+          "bm25_score": 14.619102423035557,
+          "vector_score": null,
+          "fusion_score": 0.8835122058009462,
+          "rerank_score": 0.6736638351213876,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 2,
+          "expected_evidence_match": true
+        },
+        {
+          "chunk_id": 355,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 2",
+          "symbol": "Page 2",
+          "qualified_symbol": "Page 2",
+          "final_rank": 3,
+          "final_score": 0.5479640255749065,
+          "bm25_score": 13.254553156176264,
+          "vector_score": null,
+          "fusion_score": 0.6688090508288345,
+          "rerank_score": 0.5479640255749065,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 2,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 357,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 2",
+          "symbol": "Page 2",
+          "qualified_symbol": "Page 2",
+          "final_rank": 4,
+          "final_score": 0.4993702467506047,
+          "bm25_score": 13.111141033545174,
+          "vector_score": null,
+          "fusion_score": 0.6462440647649654,
+          "rerank_score": 0.4993702467506047,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 2,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 146,
+          "source_id": "research:react_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 6",
+          "symbol": "Page 6",
+          "qualified_symbol": "Page 6",
+          "final_rank": 5,
+          "final_score": 0.37537658818616865,
+          "bm25_score": 12.008113008910145,
+          "vector_score": null,
+          "fusion_score": 0.4726896152016451,
+          "rerank_score": 0.37537658818616865,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "page": 6,
+          "expected_evidence_match": false
+        }
+      ]
+    },
+    {
+      "case_id": "reflexion-episodic-benefit",
+      "query": "Why is verbal reinforcement useful for remembering prior experience and guiding future actions?",
+      "query_type": "paraphrase",
+      "expected_source_id": "research:reflexion_pdf",
+      "expected_pages": [
+        2
+      ],
+      "expected_sections": [
+        "Page 2"
+      ],
+      "expected_evidence_anchors": [
+        "interpretable form of episodic memory",
+        "explicit hints for actions in future episodes"
+      ],
+      "resolved_expected_chunk_ids": [
+        359
+      ],
+      "backend": {
+        "vector_enabled": false,
+        "embedding_backend": null,
+        "embedding_model": null,
+        "chroma_query_used": false,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "first_expected_rank": 3,
+      "source_hit_at_5": true,
+      "top_5": [
+        {
+          "chunk_id": 354,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 2",
+          "symbol": "Page 2",
+          "qualified_symbol": "Page 2",
+          "final_rank": 1,
+          "final_score": 0.6811255402211978,
+          "bm25_score": 15.54042097267481,
+          "vector_score": null,
+          "fusion_score": 1.0,
+          "rerank_score": 0.6811255402211978,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 2,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 362,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 2",
+          "symbol": "Page 2",
+          "qualified_symbol": "Page 2",
+          "final_rank": 2,
+          "final_score": 0.6006622838434909,
+          "bm25_score": 13.987531294121359,
+          "vector_score": null,
+          "fusion_score": 0.8184657679292409,
+          "rerank_score": 0.6006622838434909,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 2,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 359,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 2",
+          "symbol": "Page 2",
+          "qualified_symbol": "Page 2",
+          "final_rank": 3,
+          "final_score": 0.556144230251258,
+          "bm25_score": 13.14048465905527,
+          "vector_score": null,
+          "fusion_score": 0.7194452370129163,
+          "rerank_score": 0.556144230251258,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 2,
+          "expected_evidence_match": true
+        },
+        {
+          "chunk_id": 371,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 3",
+          "symbol": "Page 3",
+          "qualified_symbol": "Page 3",
+          "final_rank": 4,
+          "final_score": 0.543042978637272,
+          "bm25_score": 13.205939497297845,
+          "vector_score": null,
+          "fusion_score": 0.7270969678214759,
+          "rerank_score": 0.543042978637272,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 3,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 426,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 9",
+          "symbol": "Page 9",
+          "qualified_symbol": "Page 9",
+          "final_rank": 5,
+          "final_score": 0.3051221416792892,
+          "bm25_score": 9.723551334085357,
+          "vector_score": null,
+          "fusion_score": 0.32000258776869406,
+          "rerank_score": 0.3051221416792892,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 9,
+          "expected_evidence_match": false
+        }
+      ]
+    },
+    {
+      "case_id": "reflexion-optimization-loop",
+      "query": "How do the Actor, Evaluator, Self-Reflection model, and memory interact across trials?",
+      "query_type": "method",
+      "expected_source_id": "research:reflexion_pdf",
+      "expected_pages": [
+        5
+      ],
+      "expected_sections": [
+        "Page 5"
+      ],
+      "expected_evidence_anchors": [
+        "Self-Reflection model analyzes",
+        "stored in the memory",
+        "work together through trials in a loop"
+      ],
+      "resolved_expected_chunk_ids": [
+        384
+      ],
+      "backend": {
+        "vector_enabled": false,
+        "embedding_backend": null,
+        "embedding_model": null,
+        "chroma_query_used": false,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "first_expected_rank": 2,
+      "source_hit_at_5": true,
+      "top_5": [
+        {
+          "chunk_id": 373,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 4",
+          "symbol": "Page 4",
+          "qualified_symbol": "Page 4",
+          "final_rank": 1,
+          "final_score": 0.7481927850406948,
+          "bm25_score": 28.03885216893352,
+          "vector_score": null,
+          "fusion_score": 1.0,
+          "rerank_score": 0.7481927850406948,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 4,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 384,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 5",
+          "symbol": "Page 5",
+          "qualified_symbol": "Page 5",
+          "final_rank": 2,
+          "final_score": 0.6558769236315807,
+          "bm25_score": 23.5097468991849,
+          "vector_score": null,
+          "fusion_score": 0.7459343290728768,
+          "rerank_score": 0.6558769236315807,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 5,
+          "expected_evidence_match": true
+        },
+        {
+          "chunk_id": 379,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 4",
+          "symbol": "Page 4",
+          "qualified_symbol": "Page 4",
+          "final_rank": 3,
+          "final_score": 0.4513712133244185,
+          "bm25_score": 17.930295568947272,
+          "vector_score": null,
+          "fusion_score": 0.43294821786669335,
+          "rerank_score": 0.4513712133244185,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 4,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 376,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 4",
+          "symbol": "Page 4",
+          "qualified_symbol": "Page 4",
+          "final_rank": 4,
+          "final_score": 0.326519172619587,
+          "bm25_score": 15.981684729943805,
+          "vector_score": null,
+          "fusion_score": 0.3236385218669007,
+          "rerank_score": 0.326519172619587,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 4,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 371,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 3",
+          "symbol": "Page 3",
+          "qualified_symbol": "Page 3",
+          "final_rank": 5,
+          "final_score": 0.30083668986232337,
+          "bm25_score": 13.826388136319816,
+          "vector_score": null,
+          "fusion_score": 0.20273453697532962,
+          "rerank_score": 0.30083668986232337,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 3,
+          "expected_evidence_match": false
+        }
+      ]
+    },
+    {
+      "case_id": "reflexion-self-reflection-inputs",
+      "query": "What information does the self-reflection model use to produce feedback, and where is that feedback stored?",
+      "query_type": "method",
+      "expected_source_id": "research:reflexion_pdf",
+      "expected_pages": [
+        4
+      ],
+      "expected_sections": [
+        "Page 4"
+      ],
+      "expected_evidence_anchors": [
+        "binary success status",
+        "current trajectory",
+        "persistent memory",
+        "stored in the agent’s memory"
+      ],
+      "resolved_expected_chunk_ids": [
+        379
+      ],
+      "backend": {
+        "vector_enabled": false,
+        "embedding_backend": null,
+        "embedding_model": null,
+        "chroma_query_used": false,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "first_expected_rank": 2,
+      "source_hit_at_5": true,
+      "top_5": [
+        {
+          "chunk_id": 384,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 5",
+          "symbol": "Page 5",
+          "qualified_symbol": "Page 5",
+          "final_rank": 1,
+          "final_score": 0.818888012948876,
+          "bm25_score": 25.884777713805633,
+          "vector_score": null,
+          "fusion_score": 1.0,
+          "rerank_score": 0.818888012948876,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 5,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 379,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 4",
+          "symbol": "Page 4",
+          "qualified_symbol": "Page 4",
+          "final_rank": 2,
+          "final_score": 0.7159442522925159,
+          "bm25_score": 24.099756521228024,
+          "vector_score": null,
+          "fusion_score": 0.876366250243286,
+          "rerank_score": 0.7159442522925159,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 4,
+          "expected_evidence_match": true
+        },
+        {
+          "chunk_id": 356,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 2",
+          "symbol": "Page 2",
+          "qualified_symbol": "Page 2",
+          "final_rank": 3,
+          "final_score": 0.4045191430122951,
+          "bm25_score": 16.425631569195385,
+          "vector_score": null,
+          "fusion_score": 0.34484267625630294,
+          "rerank_score": 0.4045191430122951,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 2,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 371,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 3",
+          "symbol": "Page 3",
+          "qualified_symbol": "Page 3",
+          "final_rank": 4,
+          "final_score": 0.3671818256380546,
+          "bm25_score": 15.99975230635918,
+          "vector_score": null,
+          "fusion_score": 0.3153455193446626,
+          "rerank_score": 0.3671818256380546,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 3,
+          "expected_evidence_match": false
+        },
+        {
+          "chunk_id": 370,
+          "source_id": "research:reflexion_pdf",
+          "file_path": "raw.pdf",
+          "section": "Page 3",
+          "symbol": "Page 3",
+          "qualified_symbol": "Page 3",
+          "final_rank": 5,
+          "final_score": 0.342317118902653,
+          "bm25_score": 15.493714127296448,
+          "vector_score": null,
+          "fusion_score": 0.2802964130047865,
+          "rerank_score": 0.342317118902653,
+          "retrieved_by": [
+            "bm25"
+          ],
+          "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+          "page": 3,
+          "expected_evidence_match": false
+        }
+      ]
+    }
+  ]
+}

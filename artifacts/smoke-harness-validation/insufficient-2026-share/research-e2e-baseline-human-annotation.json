@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "status": "PENDING HUMAN REVIEW",
+  "labels": [
+    "correct",
+    "incorrect",
+    "partial"
+  ],
+  "run_variant": "baseline",
+  "cases": []
+}

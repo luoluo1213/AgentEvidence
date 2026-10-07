@@ -1,0 +1,16 @@
+{
+  "source_id": "react",
+  "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+  "source_type": "paper",
+  "source_url": "https://arxiv.org/abs/2210.03629",
+  "retrieved_at": "2026-10-01",
+  "original_format": "pdf",
+  "conversion_method": "pypdf_extract_text_with_page_markers",
+  "verified": false,
+  "raw_file": "data/research_raw/react/raw.pdf",
+  "processed_file": "content.md",
+  "normalized_file": "data/research_normalized/react/document.md",
+  "normalization_method": "structure_preserving_cleanup",
+  "normalized_from": "data/research_corpus/react/content.md",
+  "references_excluded_from_retrieval": true
+}

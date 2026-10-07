@@ -1,0 +1,428 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-10-07T06:07:46.379338+00:00",
+  "results": [
+    {
+      "case_id": "compare-react-reflexion-feedback",
+      "category": "cross_document",
+      "query": "比较 ReAct 和 Reflexion 在利用反馈改进智能体行为方面的主要差异。",
+      "expected_sources": [
+        "research:react_pdf",
+        "research:reflexion_pdf"
+      ],
+      "expected_concepts": [
+        "observation",
+        "verbal reflection",
+        "trial"
+      ],
+      "answerable": true,
+      "actual_sources": [
+        "research:react_pdf",
+        "research:reflexion_pdf"
+      ],
+      "answer": "无法基于当前证据可靠生成回答",
+      "session_id": "",
+      "source_hit": true,
+      "runtime_success": true,
+      "provider_failure": false,
+      "verification_sufficient": false,
+      "fallback_used": true,
+      "fallback_stage": "draft_validation",
+      "error_type": "invalid_evidence_reference",
+      "error_message": "claim about entity 'ReAct' lacks matching evidence",
+      "result_status": "draft_fallback",
+      "agent_stage_failure": true,
+      "evidence_insufficient": false,
+      "run_variant": "baseline",
+      "memory_resolved": null,
+      "failure_stage": "draft_validation",
+      "draft_validation_failure": true,
+      "draft_validation_reason": "invalid_evidence_reference",
+      "draft_validation_message": "claim about entity 'ReAct' lacks matching evidence",
+      "draft_repair_attempts": 1,
+      "draft_repair_success": false,
+      "original_draft": {
+        "answer": "ReAct 与 Reflexion 都利用反馈来改进智能体行为，但二者在反馈的来源、时间尺度、存储方式和作用机制上存在根本差异。ReAct 的核心是把推理轨迹与动作、观察交织成一条连贯的输入流，让模型在单次任务执行过程中依据环境观察（外部反馈）动态调整推理与行动；它的推理轨迹是灵活且稀疏的，能够针对不同任务诱导出多样的推理类型，而不是仅仅对观察到的环境状态和待完成目标做密集复述。ReAct 论文通过 ReAct-IM 消融实验说明，仅依赖 IM 式密集外部反馈的提示方式整体成功率只有 53，而 ReAct 达到 71，并在六个任务中的五个上保持优势；定性上，ReAct-IM 常因缺乏高层目标分解而误判子目标是否完成或下一步子目标是什么，也常因缺乏常识推理而难以判断物品在 ALFWorld 环境中的可能位置，而这些问题在 ReAct 范式中可以得到缓解。ReAct 还强调自己不只是孤立、固定的推理，而是把模型动作及其对应观察整合进连贯的输入流，从而更准确地推理并处理交互式决策等超出纯推理的任务；论文也提到 ReAct 有通过额外训练数据改进的潜力，并可与其他范式（如强化学习）结合。\n\nReflexion 则是在多次试验（trial）之间利用语言化反馈来强化语言智能体，而不是通过更新权重。具体而言，Reflexion 智能体对任务反馈信号进行口头反思，并把反思文本保存在情节记忆缓冲区中，用以在后续试验中诱导更好的决策；它能灵活接纳多种类型（标量值或自由形式语言）和多种来源（外部或内部模拟）的反馈信号，并在顺序决策、编程、语言推理等多样任务上显著优于基线智能体，例如在 HumanEval 编程基准上达到 91% 的 pass@1 准确率，超过此前达到 80% 的 GPT-4。其自我反思模型由 LLM 实例化，给定稀疏奖励信号（如成功/失败的二元状态）、当前轨迹和持久记忆 mem，生成细致且具体的反馈；这种反馈比标量奖励信息量更大，随后被存入智能体记忆。Reflexion 的难点在于生成有用的反思反馈需要良好的错误定位能力（即信用分配问题）以及生成包含可操作改进建议的总结。在 ALFWorld 上，ReAct + Reflexion 能在连续 12 次试验中学会解决额外任务，而仅用 ReAct 时性能提升在第 6 到第 7 次试验之间就停止了；基线失败轨迹中的一个常见错误是智能体误以为自己拥有某物品而实际没有，随后执行一长串动作却无法回溯找到错误，Reflexion 可针对此类问题提供改进。不过 Reflexion 并非在所有任务上都带来增益：在 WebShop 的 100 个购物请求上，ReAct + Reflexion 未能显著超过仅用 ReAct 的表现。\n\n综合来看，两者的主要差异在于：第一，反馈的时间尺度不同——ReAct 在单次任务执行内部利用环境观察作为反馈来调整推理与动作，而 Reflexion 跨多次试验利用反思文本改进后续试验的决策。第二，反馈的形态与存储不同——ReAct 把动作与观察整合进连贯的推理-行动输入流，推理轨迹灵活稀疏；Reflexion 则把语言化反思写入情节记忆缓冲区，并可接纳标量或自由语言、外部或内部模拟的反馈。第三，改进机制不同——ReAct 不更新权重，而是在推理时把观察纳入上下文；Reflexion 同样不更新权重，但通过语言反馈和记忆在试验间强化智能体，且其自我反思模型需要解决信用分配并生成可操作的总结。第四，二者可以叠加使用：ReAct + Reflexion 在 ALFWorld 上比仅用 ReAct 能持续学习更多任务，说明 Reflexion 的跨试验反思可以补充 ReAct 的单次执行内反馈；但在 WebShop 上这种叠加未带来显著提升，表明 Reflexion 的增益依赖于任务特性。",
+        "claims": [
+          {
+            "claim_id": "claim-1",
+            "text": "ReAct 把模型动作及其对应观察整合进一条连贯的输入流，使模型能更准确地推理并处理交互式决策等超出纯推理的任务。",
+            "evidence_ids": [
+              "research:react_pdf:1719"
+            ]
+          },
+          {
+            "claim_id": "claim-2",
+            "text": "ReAct 的推理轨迹灵活且稀疏，能够针对不同任务诱导出多样的推理类型，而不是像 Inner Monologue 那样仅局限于观察环境状态和待完成目标。",
+            "evidence_ids": [
+              "research:react_pdf:1713"
+            ]
+          },
+          {
+            "claim_id": "claim-3",
+            "text": "在 ReAct 论文的消融实验中，ReAct 整体成功率为 71，而 IM 式密集外部反馈提示（ReAct-IM）仅为 53，ReAct 在六个任务中的五个上保持优势。",
+            "evidence_ids": [
+              "research:react_pdf:1713"
+            ]
+          },
+          {
+            "claim_id": "claim-4",
+            "text": "ReAct-IM 常因缺乏高层目标分解而误判子目标是否完成或下一步子目标是什么，也常因缺乏常识推理而难以判断物品在 ALFWorld 环境中的可能位置，而这些问题可在 ReAct 范式中得到缓解。",
+            "evidence_ids": [
+              "research:react_pdf:1713"
+            ]
+          },
+          {
+            "claim_id": "claim-5",
+            "text": "ReAct 论文指出 ReAct 有通过额外训练数据改进的潜力，并可与其他范式（如强化学习）结合。",
+            "evidence_ids": [
+              "research:react_pdf:1657"
+            ]
+          },
+          {
+            "claim_id": "claim-6",
+            "text": "Reflexion 通过语言反馈而非更新权重来强化语言智能体。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1889"
+            ]
+          },
+          {
+            "claim_id": "claim-7",
+            "text": "Reflexion 智能体对任务反馈信号进行口头反思，并把反思文本保存在情节记忆缓冲区中，以在后续试验中诱导更好的决策。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1889"
+            ]
+          },
+          {
+            "claim_id": "claim-8",
+            "text": "Reflexion 能灵活接纳多种类型（标量值或自由形式语言）和多种来源（外部或内部模拟）的反馈信号，并在顺序决策、编程、语言推理等多样任务上显著优于基线智能体。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1889"
+            ]
+          },
+          {
+            "claim_id": "claim-9",
+            "text": "Reflexion 在 HumanEval 编程基准上达到 91% 的 pass@1 准确率，超过此前达到 80% 的 GPT-4。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1889"
+            ]
+          },
+          {
+            "claim_id": "claim-10",
+            "text": "Reflexion 的自我反思模型由 LLM 实例化，给定稀疏奖励信号（如成功/失败的二元状态）、当前轨迹和持久记忆 mem，生成细致且具体的反馈，该反馈比标量奖励信息量更大，随后被存入智能体记忆。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1918"
+            ]
+          },
+          {
+            "claim_id": "claim-11",
+            "text": "生成有用的反思反馈具有挑战性，因为它需要良好的错误定位能力（即信用分配问题）以及生成包含可操作改进建议的总结。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1895"
+            ]
+          },
+          {
+            "claim_id": "claim-12",
+            "text": "在 ALFWorld 上，ReAct + Reflexion 能在连续 12 次试验中学会解决额外任务，而仅用 ReAct 时性能提升在第 6 到第 7 次试验之间就停止了。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1931"
+            ]
+          },
+          {
+            "claim_id": "claim-13",
+            "text": "基线失败轨迹中的一个常见错误是智能体误以为自己拥有某物品而实际没有，随后执行一长串动作却无法回溯找到错误，Reflexion 可针对此类问题提供改进。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1931"
+            ]
+          },
+          {
+            "claim_id": "claim-14",
+            "text": "在 WebShop 的 100 个购物请求上，ReAct + Reflexion 未能显著超过仅用 ReAct 的表现。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1993"
+            ]
+          },
+          {
+            "claim_id": "claim-15",
+            "text": "ReAct 在单次任务执行内部利用环境观察作为反馈来调整推理与动作，而 Reflexion 跨多次试验利用反思文本改进后续试验的决策。",
+            "evidence_ids": [
+              "research:react_pdf:1719",
+              "research:reflexion_pdf:1889"
+            ]
+          },
+          {
+            "claim_id": "claim-16",
+            "text": "ReAct 把动作与观察整合进连贯的推理-行动输入流且推理轨迹灵活稀疏，而 Reflexion 把语言化反思写入情节记忆缓冲区并可接纳标量或自由语言、外部或内部模拟的反馈。",
+            "evidence_ids": [
+              "research:react_pdf:1713",
+              "research:reflexion_pdf:1889",
+              "research:reflexion_pdf:1918"
+            ]
+          },
+          {
+            "claim_id": "claim-17",
+            "text": "ReAct 与 Reflexion 都不更新权重，但 Reflexion 通过语言反馈和记忆在试验间强化智能体，且其自我反思模型需要解决信用分配并生成可操作的总结。",
+            "evidence_ids": [
+              "research:react_pdf:1657",
+              "research:reflexion_pdf:1889",
+              "research:reflexion_pdf:1895"
+            ]
+          },
+          {
+            "claim_id": "claim-18",
+            "text": "ReAct + Reflexion 在 ALFWorld 上比仅用 ReAct 能持续学习更多任务，说明 Reflexion 的跨试验反思可以补充 ReAct 的单次执行内反馈；但在 WebShop 上这种叠加未带来显著提升，表明 Reflexion 的增益依赖于任务特性。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1931",
+              "research:reflexion_pdf:1993"
+            ]
+          }
+        ]
+      },
+      "original_validation_reason": "invalid_evidence_reference",
+      "original_validation_message": "claim about entity 'ReAct' lacks matching evidence",
+      "repaired_draft": {
+        "answer": "ReAct 与 Reflexion 都利用反馈改进智能体行为，但二者在反馈的时间尺度、形态、存储方式和作用机制上存在根本差异。\n\nReAct 的核心是在单次任务执行内部，把推理轨迹与动作、对应观察交织成一条连贯的输入流，让模型依据环境观察（外部反馈）动态调整推理与行动。ReAct 的推理轨迹灵活且稀疏，能够针对不同任务诱导出多样的推理类型，而不是像 Inner Monologue 那样仅局限于观察环境状态和待完成目标。ReAct 论文通过 ReAct-IM 消融实验说明，仅依赖 IM 式密集外部反馈的提示方式整体成功率只有 53，而 ReAct 达到 71，并在六个任务中的五个上保持优势；定性上，ReAct-IM 常因缺乏高层目标分解而误判子目标是否完成或下一步子目标是什么，也常因缺乏常识推理而难以判断物品在 ALFWorld 环境中的可能位置，而这些问题在 ReAct 范式中可以得到缓解。ReAct 还强调自己不只是孤立、固定的推理，而是把模型动作及其对应观察整合进连贯的输入流，从而更准确地推理并处理交互式决策等超出纯推理的任务；论文也提到 ReAct 有通过额外训练数据改进的潜力，并可与其他范式（如强化学习）结合。\n\nReflexion 则是在多次试验（trial）之间利用语言化反馈来强化语言智能体，而不是通过更新权重。具体而言，Reflexion 智能体对任务反馈信号进行口头反思，并把反思文本保存在情节记忆缓冲区中，用以在后续试验中诱导更好的决策；它能灵活接纳多种类型（标量值或自由形式语言）和多种来源（外部或内部模拟）的反馈信号，并在顺序决策、编程、语言推理等多样任务上显著优于基线智能体，例如在 HumanEval 编程基准上达到 91% 的 pass@1 准确率，超过此前达到 80% 的 GPT-4。其自我反思模型由 LLM 实例化，给定稀疏奖励信号（如成功/失败的二元状态）、当前轨迹和持久记忆 mem，生成细致且具体的反馈；这种反馈比标量奖励信息量更大，随后被存入智能体记忆。Reflexion 的难点在于生成有用的反思反馈需要良好的错误定位能力（即信用分配问题）以及生成包含可操作改进建议的总结。在 ALFWorld 上，ReAct + Reflexion 能在连续 12 次试验中学会解决额外任务，而仅用 ReAct 时性能提升在第 6 到第 7 次试验之间就停止了；基线失败轨迹中的一个常见错误是智能体误以为自己拥有某物品而实际没有，随后执行一长串动作却无法回溯找到错误，Reflexion 可针对此类问题提供改进。不过 Reflexion 并非在所有任务上都带来增益：在 WebShop 的 100 个购物请求上，ReAct + Reflexion 未能显著超过仅用 ReAct 的表现。\n\n综合来看，两者的主要差异在于：第一，反馈的时间尺度不同——ReAct 在单次任务执行内部利用环境观察作为反馈来调整推理与动作，而 Reflexion 跨多次试验利用反思文本改进后续试验的决策。第二，反馈的形态与存储不同——ReAct 把动作与观察整合进连贯的推理-行动输入流，推理轨迹灵活稀疏；Reflexion 则把语言化反思写入情节记忆缓冲区，并可接纳标量或自由语言、外部或内部模拟的反馈。第三，改进机制不同——ReAct 不更新权重，而是在推理时把观察纳入上下文；Reflexion 同样不更新权重，但通过语言反馈和记忆在试验间强化智能体，且其自我反思模型需要解决信用分配并生成可操作的总结。第四，二者可以叠加使用：ReAct + Reflexion 在 ALFWorld 上比仅用 ReAct 能持续学习更多任务，说明 Reflexion 的跨试验反思可以补充 ReAct 的单次执行内反馈；但在 WebShop 上这种叠加未带来显著提升，表明 Reflexion 的增益依赖于任务特性。",
+        "claims": [
+          {
+            "claim_id": "claim-1",
+            "text": "ReAct 把模型动作及其对应观察整合进一条连贯的输入流，使模型能更准确地推理并处理交互式决策等超出纯推理的任务。",
+            "evidence_ids": [
+              "research:react_pdf:1719"
+            ]
+          },
+          {
+            "claim_id": "claim-2",
+            "text": "ReAct 的推理轨迹灵活且稀疏，能够针对不同任务诱导出多样的推理类型，而不是像 Inner Monologue 那样仅局限于观察环境状态和待完成目标。",
+            "evidence_ids": [
+              "research:react_pdf:1713"
+            ]
+          },
+          {
+            "claim_id": "claim-3",
+            "text": "在 ReAct 论文的消融实验中，ReAct 整体成功率为 71，而 IM 式密集外部反馈提示（ReAct-IM）仅为 53，ReAct 在六个任务中的五个上保持优势。",
+            "evidence_ids": [
+              "research:react_pdf:1713"
+            ]
+          },
+          {
+            "claim_id": "claim-4",
+            "text": "ReAct-IM 常因缺乏高层目标分解而误判子目标是否完成或下一步子目标是什么，也常因缺乏常识推理而难以判断物品在 ALFWorld 环境中的可能位置，而这些问题可在 ReAct 范式中得到缓解。",
+            "evidence_ids": [
+              "research:react_pdf:1713"
+            ]
+          },
+          {
+            "claim_id": "claim-5",
+            "text": "ReAct 论文指出 ReAct 有通过额外训练数据改进的潜力，并可与其他范式（如强化学习）结合。",
+            "evidence_ids": [
+              "research:react_pdf:1657"
+            ]
+          },
+          {
+            "claim_id": "claim-6",
+            "text": "Reflexion 通过语言反馈而非更新权重来强化语言智能体。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1889"
+            ]
+          },
+          {
+            "claim_id": "claim-7",
+            "text": "Reflexion 智能体对任务反馈信号进行口头反思，并把反思文本保存在情节记忆缓冲区中，以在后续试验中诱导更好的决策。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1889"
+            ]
+          },
+          {
+            "claim_id": "claim-8",
+            "text": "Reflexion 能灵活接纳多种类型（标量值或自由形式语言）和多种来源（外部或内部模拟）的反馈信号，并在顺序决策、编程、语言推理等多样任务上显著优于基线智能体。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1889"
+            ]
+          },
+          {
+            "claim_id": "claim-9",
+            "text": "Reflexion 在 HumanEval 编程基准上达到 91% 的 pass@1 准确率，超过此前达到 80% 的 GPT-4。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1889"
+            ]
+          },
+          {
+            "claim_id": "claim-10",
+            "text": "Reflexion 的自我反思模型由 LLM 实例化，给定稀疏奖励信号（如成功/失败的二元状态）、当前轨迹和持久记忆 mem，生成细致且具体的反馈，该反馈比标量奖励信息量更大，随后被存入智能体记忆。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1918"
+            ]
+          },
+          {
+            "claim_id": "claim-11",
+            "text": "生成有用的反思反馈具有挑战性，因为它需要良好的错误定位能力（即信用分配问题）以及生成包含可操作改进建议的总结。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1895"
+            ]
+          },
+          {
+            "claim_id": "claim-12",
+            "text": "在 ALFWorld 上，ReAct + Reflexion 能在连续 12 次试验中学会解决额外任务，而仅用 ReAct 时性能提升在第 6 到第 7 次试验之间就停止了。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1931"
+            ]
+          },
+          {
+            "claim_id": "claim-13",
+            "text": "基线失败轨迹中的一个常见错误是智能体误以为自己拥有某物品而实际没有，随后执行一长串动作却无法回溯找到错误，Reflexion 可针对此类问题提供改进。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1931"
+            ]
+          },
+          {
+            "claim_id": "claim-14",
+            "text": "在 WebShop 的 100 个购物请求上，ReAct + Reflexion 未能显著超过仅用 ReAct 的表现。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1993"
+            ]
+          },
+          {
+            "claim_id": "claim-15",
+            "text": "ReAct 在单次任务执行内部利用环境观察作为反馈来调整推理与动作，而 Reflexion 跨多次试验利用反思文本改进后续试验的决策。",
+            "evidence_ids": [
+              "research:react_pdf:1719",
+              "research:reflexion_pdf:1889"
+            ]
+          },
+          {
+            "claim_id": "claim-16",
+            "text": "ReAct 把动作与观察整合进连贯的推理-行动输入流，推理轨迹灵活稀疏；Reflexion 则把语言化反思写入情节记忆缓冲区，并可接纳标量或自由语言、外部或内部模拟的反馈。",
+            "evidence_ids": [
+              "research:react_pdf:1713",
+              "research:reflexion_pdf:1889"
+            ]
+          },
+          {
+            "claim_id": "claim-17",
+            "text": "ReAct 不更新权重，而是在推理时把观察纳入上下文；Reflexion 同样不更新权重，但通过语言反馈和记忆在试验间强化智能体，且其自我反思模型需要解决信用分配并生成可操作的总结。",
+            "evidence_ids": [
+              "research:react_pdf:1719",
+              "research:reflexion_pdf:1889",
+              "research:reflexion_pdf:1895"
+            ]
+          },
+          {
+            "claim_id": "claim-18",
+            "text": "ReAct + Reflexion 在 ALFWorld 上比仅用 ReAct 能持续学习更多任务，说明 Reflexion 的跨试验反思可以补充 ReAct 的单次执行内反馈；但在 WebShop 上这种叠加未带来显著提升，表明 Reflexion 的增益依赖于任务特性。",
+            "evidence_ids": [
+              "research:reflexion_pdf:1931",
+              "research:reflexion_pdf:1993"
+            ]
+          }
+        ]
+      },
+      "repair_validation_reason": "invalid_evidence_reference",
+      "repair_validation_message": "claim about entity 'ReAct' lacks matching evidence",
+      "prompt_tokens": 9697,
+      "completion_tokens": 4839,
+      "total_tokens": 14536,
+      "estimated_cost": null,
+      "llm_traces": [
+        {
+          "run_id": "b7dbf1a2ec594ff7a2cde12bdd158940",
+          "case_id": "compare-react-reflexion-feedback",
+          "stage": "analysis",
+          "agent": "TaskAnalyzer",
+          "attempt": 1,
+          "latency_ms": 1664.341,
+          "status": "ok",
+          "error_type": null,
+          "prompt_tokens": 412,
+          "completion_tokens": 115,
+          "total_tokens": 527,
+          "provider": "openai",
+          "model": "deepseek-chat",
+          "estimated_cost": null
+        },
+        {
+          "run_id": "b7dbf1a2ec594ff7a2cde12bdd158940",
+          "case_id": "compare-react-reflexion-feedback",
+          "stage": "draft",
+          "agent": "DraftAgent",
+          "attempt": 1,
+          "latency_ms": 10033.875,
+          "status": "ok",
+          "error_type": null,
+          "prompt_tokens": 3656,
+          "completion_tokens": 2359,
+          "total_tokens": 6015,
+          "provider": "openai",
+          "model": "deepseek-chat",
+          "estimated_cost": null
+        },
+        {
+          "run_id": "b7dbf1a2ec594ff7a2cde12bdd158940",
+          "case_id": "compare-react-reflexion-feedback",
+          "stage": "draft_repair",
+          "agent": "DraftAgent",
+          "attempt": 1,
+          "latency_ms": 7565.187,
+          "status": "ok",
+          "error_type": null,
+          "prompt_tokens": 5629,
+          "completion_tokens": 2365,
+          "total_tokens": 7994,
+          "provider": "openai",
+          "model": "deepseek-chat",
+          "estimated_cost": null
+        }
+      ],
+      "latency_ms": 39615.122
+    }
+  ],
+  "traces": [
+    {
+      "run_id": "b7dbf1a2ec594ff7a2cde12bdd158940",
+      "case_id": "compare-react-reflexion-feedback",
+      "stage": "analysis",
+      "agent": "TaskAnalyzer",
+      "attempt": 1,
+      "latency_ms": 1664.341,
+      "status": "ok",
+      "error_type": null,
+      "prompt_tokens": 412,
+      "completion_tokens": 115,
+      "total_tokens": 527,
+      "provider": "openai",
+      "model": "deepseek-chat",
+      "estimated_cost": null
+    },
+    {
+      "run_id": "b7dbf1a2ec594ff7a2cde12bdd158940",
+      "case_id": "compare-react-reflexion-feedback",
+      "stage": "draft",
+      "agent": "DraftAgent",
+      "attempt": 1,
+      "latency_ms": 10033.875,
+      "status": "ok",
+      "error_type": null,
+      "prompt_tokens": 3656,
+      "completion_tokens": 2359,
+      "total_tokens": 6015,
+      "provider": "openai",
+      "model": "deepseek-chat",
+      "estimated_cost": null
+    },
+    {
+      "run_id": "b7dbf1a2ec594ff7a2cde12bdd158940",
+      "case_id": "compare-react-reflexion-feedback",
+      "stage": "draft_repair",
+      "agent": "DraftAgent",
+      "attempt": 1,
+      "latency_ms": 7565.187,
+      "status": "ok",
+      "error_type": null,
+      "prompt_tokens": 5629,
+      "completion_tokens": 2365,
+      "total_tokens": 7994,
+      "provider": "openai",
+      "model": "deepseek-chat",
+      "estimated_cost": null
+    }
+  ]
+}

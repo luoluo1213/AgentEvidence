@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "name": "AgentEvidence Small Benchmark",
+  "cases": [
+    {
+      "case_id": "single-react-mechanism",
+      "category": "single_turn",
+      "query": "ReAct 如何把推理、行动与环境观察结合起来？",
+      "expected_source_ids": ["research:react"],
+      "expected_concepts": ["reasoning", "action", "observation"]
+    },
+    {
+      "case_id": "single-react-feedback",
+      "category": "single_turn",
+      "query": "ReAct 如何利用执行后的 environment feedback 决定下一步？",
+      "expected_source_ids": ["research:react"],
+      "expected_concepts": ["environment", "feedback", "action"]
+    },
+    {
+      "case_id": "single-reflexion-mechanism",
+      "category": "single_turn",
+      "query": "Reflexion 如何通过语言反思改进后续尝试？",
+      "expected_source_ids": ["research:reflexion"],
+      "expected_concepts": ["reflection", "feedback", "memory"]
+    },
+    {
+      "case_id": "single-reflexion-components",
+      "category": "single_turn",
+      "query": "Reflexion 中 Actor、Evaluator 和 Self-Reflection 分别有什么作用？",
+      "expected_source_ids": ["research:reflexion"],
+      "expected_concepts": ["actor", "evaluator", "self-reflection"]
+    },
+    {
+      "case_id": "single-react-reflexion-comparison",
+      "category": "single_turn",
+      "query": "比较 ReAct 和 Reflexion 如何利用执行反馈",
+      "expected_source_ids": ["research:react", "research:reflexion"],
+      "expected_concepts": ["observation", "reflection", "feedback"]
+    },
+    {
+      "case_id": "single-mini-architecture",
+      "category": "single_turn",
+      "query": "mini-SWE-agent 的 Agent loop 由哪些主要组件构成？",
+      "expected_source_ids": ["research:mini_swe_agent"],
+      "expected_concepts": ["agent", "environment", "history"]
+    },
+    {
+      "case_id": "single-mini-action-execution",
+      "category": "single_turn",
+      "query": "mini-SWE-agent 如何执行 action？",
+      "expected_source_ids": ["research:mini_swe_agent"],
+      "expected_concepts": ["execute_actions", "LocalEnvironment.execute", "observation"]
+    },
+    {
+      "case_id": "single-mini-history",
+      "category": "single_turn",
+      "query": "mini-SWE-agent 如何把 action 的执行结果加入 history？",
+      "expected_source_ids": ["research:mini_swe_agent"],
+      "expected_concepts": ["add_messages", "messages.extend", "observation"]
+    },
+    {
+      "case_id": "session-mini-action",
+      "category": "same_session_multi_turn",
+      "turns": ["介绍 mini-SWE-agent 的 Agent loop", "那它怎么执行 action？"],
+      "expected_source_ids": ["research:mini_swe_agent"],
+      "expected_concepts": ["execute_actions", "observation"],
+      "expected_resolved_terms": ["mini-SWE-agent", "action"]
+    },
+    {
+      "case_id": "session-mini-history",
+      "category": "same_session_multi_turn",
+      "turns": ["mini-SWE-agent 执行 action 后会得到 observation。", "这个结果怎么进入下一轮 history？"],
+      "expected_source_ids": ["research:mini_swe_agent"],
+      "expected_concepts": ["add_messages", "history"],
+      "expected_resolved_terms": ["mini-SWE-agent", "history"]
+    },
+    {
+      "case_id": "session-react-observation",
+      "category": "same_session_multi_turn",
+      "turns": ["介绍 ReAct 的 reasoning-action loop。", "它得到 observation 后怎么继续？"],
+      "expected_source_ids": ["research:react"],
+      "expected_concepts": ["observation", "reasoning"],
+      "expected_resolved_terms": ["ReAct", "observation"]
+    },
+    {
+      "case_id": "session-reflexion-memory",
+      "category": "same_session_multi_turn",
+      "turns": ["介绍 Reflexion 的 verbal reinforcement learning。", "这种反思如何留给下一次尝试？"],
+      "expected_source_ids": ["research:reflexion"],
+      "expected_concepts": ["reflection", "memory"],
+      "expected_resolved_terms": ["Reflexion", "反思"]
+    },
+    {
+      "case_id": "session-comparison-ellipsis",
+      "category": "same_session_multi_turn",
+      "turns": ["比较 ReAct 和 Reflexion。", "二者使用反馈的时机有什么不同？"],
+      "expected_source_ids": ["research:react", "research:reflexion"],
+      "expected_concepts": ["observation", "reflection"],
+      "expected_resolved_terms": ["ReAct", "Reflexion"]
+    },
+    {
+      "case_id": "session-mini-environment",
+      "category": "same_session_multi_turn",
+      "turns": ["mini-SWE-agent 的 LocalEnvironment 负责执行命令。", "它怎样处理工作目录和返回结果？"],
+      "expected_source_ids": ["research:mini_swe_agent"],
+      "expected_concepts": ["LocalEnvironment.execute", "returncode"],
+      "expected_resolved_terms": ["mini-SWE-agent", "LocalEnvironment"]
+    },
+    {
+      "case_id": "cross-mini-agent-loop",
+      "category": "cross_session_memory",
+      "session_a": "我正在研究 mini-SWE-agent 的 Agent loop。",
+      "session_b": "继续我们之前关于这个项目的分析。",
+      "expected_source_ids": ["research:mini_swe_agent"],
+      "expected_concepts": ["agent", "loop"],
+      "expected_resolved_terms": ["mini-SWE-agent", "Agent loop"]
+    },
+    {
+      "case_id": "cross-mini-actions",
+      "category": "cross_session_memory",
+      "session_a": "我的研究主题是 mini-SWE-agent 的 action execution。",
+      "session_b": "继续分析这个主题的执行路径。",
+      "expected_source_ids": ["research:mini_swe_agent"],
+      "expected_concepts": ["execute_actions", "execute"],
+      "expected_resolved_terms": ["mini-SWE-agent", "action execution"]
+    },
+    {
+      "case_id": "cross-mini-history",
+      "category": "cross_session_memory",
+      "session_a": "我在研究 mini-SWE-agent 如何更新 message history。",
+      "session_b": "继续之前的 history 更新问题。",
+      "expected_source_ids": ["research:mini_swe_agent"],
+      "expected_concepts": ["add_messages", "history"],
+      "expected_resolved_terms": ["mini-SWE-agent", "history"]
+    },
+    {
+      "case_id": "cross-mini-environment",
+      "category": "cross_session_memory",
+      "session_a": "我的项目上下文是 mini-SWE-agent 的 LocalEnvironment。",
+      "session_b": "继续分析它如何执行命令。",
+      "expected_source_ids": ["research:mini_swe_agent"],
+      "expected_concepts": ["LocalEnvironment", "command"],
+      "expected_resolved_terms": ["mini-SWE-agent", "LocalEnvironment"]
+    },
+    {
+      "case_id": "insufficient-training-cost",
+      "category": "insufficient_evidence",
+      "query": "ReAct 论文训练一次具体花费多少美元？",
+      "expected_source_ids": [],
+      "expected_concepts": [],
+      "expected_insufficient": true
+    },
+    {
+      "case_id": "insufficient-mini-production-users",
+      "category": "insufficient_evidence",
+      "query": "mini-SWE-agent 当前生产环境每天有多少活跃用户？",
+      "expected_source_ids": [],
+      "expected_concepts": [],
+      "expected_insufficient": true
+    }
+  ]
+}

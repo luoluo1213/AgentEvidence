@@ -1,0 +1,874 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-10-03T10:06:26.321359+00:00",
+  "mode": "hybrid",
+  "top_k": 5,
+  "ranking": {
+    "candidate_k": 16,
+    "vector_weight": 0.65,
+    "bm25_weight": 0.35,
+    "rerank_enabled": true
+  },
+  "metrics": {
+    "symbol_hit_at_1": 0.0,
+    "symbol_hit_at_3": 0.0,
+    "symbol_hit_at_5": 0.0,
+    "any_expected_symbol_hit_at_5": 0.0,
+    "all_expected_symbols_hit_at_5": 0.0,
+    "mrr": 0.0
+  },
+  "cases": [
+    {
+      "case_id": "single-mini-architecture",
+      "query": "mini-SWE-agent 的 Agent loop 由哪些主要组件构成？",
+      "expected_source_id": "research:mini_swe_agent",
+      "expected_symbols": [
+        "DefaultAgent.run",
+        "DefaultAgent.add_messages",
+        "LocalEnvironment.execute"
+      ],
+      "qualified_symbols": [
+        "DefaultAgent.run",
+        "DefaultAgent.add_messages",
+        "LocalEnvironment.execute"
+      ],
+      "expected_file_paths": [
+        "src/minisweagent/agents/default.py",
+        "src/minisweagent/environments/local.py"
+      ],
+      "backend": {
+        "vector_enabled": true,
+        "embedding_backend": "openai-compatible",
+        "embedding_model": "text-embedding-3-small",
+        "chroma_query_used": true,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "symbol_ranks": {
+        "DefaultAgent.run": null,
+        "DefaultAgent.add_messages": null,
+        "LocalEnvironment.execute": null
+      },
+      "first_expected_rank": null,
+      "any_expected_symbol_hit_at_5": false,
+      "all_expected_symbols_hit_at_5": false,
+      "top_5": [
+        {
+          "chunk_id": 12,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "Should I use SWE-agent or mini-SWE-agent?",
+          "symbol": "Should I use SWE-agent or mini-SWE-agent?",
+          "qualified_symbol": null,
+          "final_rank": 1,
+          "final_score": 0.5021394520519599,
+          "bm25_score": 0.1093963477747344,
+          "vector_score": 0.7253708660730835,
+          "fusion_score": 0.6540746043440723,
+          "rerank_score": 0.5021394520519599,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 1,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "The minimal AI software engineering agent",
+          "symbol": "The minimal AI software engineering agent",
+          "qualified_symbol": null,
+          "final_rank": 2,
+          "final_score": 0.4536525891616635,
+          "bm25_score": 0.09989022479162527,
+          "vector_score": 0.7090981491395776,
+          "fusion_score": 0.5769144991782637,
+          "rerank_score": 0.4536525891616635,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 13,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "Should I use SWE-agent or mini-SWE-agent?",
+          "symbol": "Should I use SWE-agent or mini-SWE-agent?",
+          "qualified_symbol": null,
+          "final_rank": 3,
+          "final_score": 0.43224442507127464,
+          "bm25_score": 0.1076301760623054,
+          "vector_score": 0.6994844393768291,
+          "fusion_score": 0.5329312355250646,
+          "rerank_score": 0.43224442507127464,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 2,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "The minimal AI software engineering agent",
+          "symbol": "The minimal AI software engineering agent",
+          "qualified_symbol": null,
+          "final_rank": 4,
+          "final_score": 0.4150161606674644,
+          "bm25_score": 0.10765160670467365,
+          "vector_score": 0.6920477107043872,
+          "fusion_score": 0.4981922396813976,
+          "rerank_score": 0.4150161606674644,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 5,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (for research)",
+          "symbol": "More motivation (for research)",
+          "qualified_symbol": null,
+          "final_rank": 5,
+          "final_score": 0.4149102266469804,
+          "bm25_score": 0.09331513545368778,
+          "vector_score": 0.6993569796139492,
+          "fusion_score": 0.5306188460336925,
+          "rerank_score": 0.4149102266469804,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "session-mini-action",
+      "query": "Use the supplied conversation memory only to resolve references in the current research question.\n\nSession summary:\n学生近期关注：介绍 mini-SWE-agent 的 Agent loop 已给过的支持：无法基于当前证据可靠生成回答\n\nRecent conversation:\nuser: 介绍 mini-SWE-agent 的 Agent loop\nassistant: 无法基于当前证据可靠生成回答\n\nStable research context:\nentity: mini-SWE-agent\nresearch_topic: 介绍 mini-SWE-agent 的 Agent loop\n\nCurrent research question:\n那它怎么执行 action？",
+      "expected_source_id": "research:mini_swe_agent",
+      "expected_symbols": [
+        "DefaultAgent.execute_actions"
+      ],
+      "qualified_symbols": [
+        "DefaultAgent.execute_actions"
+      ],
+      "expected_file_paths": [
+        "src/minisweagent/agents/default.py"
+      ],
+      "backend": {
+        "vector_enabled": true,
+        "embedding_backend": "openai-compatible",
+        "embedding_model": "text-embedding-3-small",
+        "chroma_query_used": true,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "symbol_ranks": {
+        "DefaultAgent.execute_actions": null
+      },
+      "first_expected_rank": null,
+      "any_expected_symbol_hit_at_5": false,
+      "all_expected_symbols_hit_at_5": false,
+      "top_5": [
+        {
+          "chunk_id": 5,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (for research)",
+          "symbol": "More motivation (for research)",
+          "qualified_symbol": null,
+          "final_rank": 1,
+          "final_score": 0.5665473421994595,
+          "bm25_score": 10.709431879098757,
+          "vector_score": 0.6735507132500463,
+          "fusion_score": 0.8327816648540928,
+          "rerank_score": 0.5665473421994595,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 12,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "Should I use SWE-agent or mini-SWE-agent?",
+          "symbol": "Should I use SWE-agent or mini-SWE-agent?",
+          "qualified_symbol": null,
+          "final_rank": 2,
+          "final_score": 0.4850314472180481,
+          "bm25_score": 8.888956439525371,
+          "vector_score": 0.6593423800089934,
+          "fusion_score": 0.682330442872156,
+          "rerank_score": 0.4850314472180481,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 8,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (for research)",
+          "symbol": "More motivation (for research)",
+          "qualified_symbol": null,
+          "final_rank": 3,
+          "final_score": 0.4813495054886915,
+          "bm25_score": 13.319134485502635,
+          "vector_score": 0.6434154644123196,
+          "fusion_score": 0.7127507245227849,
+          "rerank_score": 0.4813495054886915,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 9,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (as a tool)",
+          "symbol": "More motivation (as a tool)",
+          "qualified_symbol": null,
+          "final_rank": 4,
+          "final_score": 0.41283169923483964,
+          "bm25_score": 9.707940555443793,
+          "vector_score": 0.6403832325802747,
+          "fusion_score": 0.5814998909919116,
+          "rerank_score": 0.41283169923483964,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 7,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (for research)",
+          "symbol": "More motivation (for research)",
+          "qualified_symbol": null,
+          "final_rank": 5,
+          "final_score": 0.3951411232431994,
+          "bm25_score": 16.144945834392534,
+          "vector_score": 0.6057513251337964,
+          "fusion_score": 0.5493218970871085,
+          "rerank_score": 0.3951411232431994,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "session-mini-environment",
+      "query": "Use the supplied conversation memory only to resolve references in the current research question.\n\nSession summary:\n学生近期关注：mini-SWE-agent 的 LocalEnvironment 负责执行命令。 已给过的支持：执行链从 DefaultAgent.step 开始：它先调用 query 获得模型消息，再把该消息交给 execute_actions...\n\nRecent conversation:\nuser: mini-SWE-agent 的 LocalEnvironment 负责执行命令。\nassistant: 执行链从 DefaultAgent.step 开始：它先调用 query 获得模型消息，再把该消息交给 execute_actions。execute_actions 从消息的 actions 字段读取一个或多个 action，并逐个调用环境的 execute 方法。\n\n在本地环境中，LocalEnvironment.execute 取得 command 和工作目录，执行命令后把输出、返回码等信息组织成结果字典，再由 agent 按 observation 模板形成新的消息。最后，DefaultAgent.add_messages 使用 messages.extend 将这些 observation 消息追加到线性消息历史中。\n\n因此，action 执行与 history 更新不是两个孤立步骤，而是一条连续链路：模型产生 action，环境返回结构化执行结果，agent 将结果转换为 observation 并追加到 messages，下一轮 query 随即能够看到此前的执行反馈。\n\nStable research context:\nentity: mini-SWE-agent\nresearch_topic: mini-SWE-agent 的 LocalEnvironment 负责执行命令。\n\nCurrent research question:\n它怎样处理工作目录和返回结果？",
+      "expected_source_id": "research:mini_swe_agent",
+      "expected_symbols": [
+        "LocalEnvironment.execute"
+      ],
+      "qualified_symbols": [
+        "LocalEnvironment.execute"
+      ],
+      "expected_file_paths": [
+        "src/minisweagent/environments/local.py"
+      ],
+      "backend": {
+        "vector_enabled": true,
+        "embedding_backend": "openai-compatible",
+        "embedding_model": "text-embedding-3-small",
+        "chroma_query_used": true,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "symbol_ranks": {
+        "LocalEnvironment.execute": null
+      },
+      "first_expected_rank": null,
+      "any_expected_symbol_hit_at_5": false,
+      "all_expected_symbols_hit_at_5": false,
+      "top_5": [
+        {
+          "chunk_id": 11,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (as a tool)",
+          "symbol": "More motivation (as a tool)",
+          "qualified_symbol": null,
+          "final_rank": 1,
+          "final_score": 0.429370235948602,
+          "bm25_score": 21.622569448918714,
+          "vector_score": 0.6840346250585917,
+          "fusion_score": 0.6900274714641487,
+          "rerank_score": 0.429370235948602,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 25,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "src/minisweagent/agents/default.py",
+          "section": "DefaultAgent.execute_actions",
+          "symbol": "DefaultAgent.execute_actions",
+          "qualified_symbol": "DefaultAgent.execute_actions",
+          "final_rank": 2,
+          "final_score": 0.34107540374958445,
+          "bm25_score": 85.95000140799385,
+          "vector_score": 0.6325455388839524,
+          "fusion_score": 0.47761960794974834,
+          "rerank_score": 0.34107540374958445,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 23,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "src/minisweagent/agents/default.py",
+          "section": "DefaultAgent.step",
+          "symbol": "DefaultAgent.step",
+          "qualified_symbol": "DefaultAgent.step",
+          "final_rank": 3,
+          "final_score": 0.3378191407264622,
+          "bm25_score": 70.14176097625301,
+          "vector_score": 0.639666448980238,
+          "fusion_score": 0.4736898465112884,
+          "rerank_score": 0.3378191407264622,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 13,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "Should I use SWE-agent or mini-SWE-agent?",
+          "symbol": "Should I use SWE-agent or mini-SWE-agent?",
+          "qualified_symbol": null,
+          "final_rank": 4,
+          "final_score": 0.33366427022893996,
+          "bm25_score": null,
+          "vector_score": 0.6714724958958971,
+          "fusion_score": 0.5225514386731048,
+          "rerank_score": 0.33366427022893996,
+          "retrieved_by": [
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 5,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (for research)",
+          "symbol": "More motivation (for research)",
+          "qualified_symbol": null,
+          "final_rank": 5,
+          "final_score": 0.26821816960595024,
+          "bm25_score": null,
+          "vector_score": 0.6599457250158565,
+          "fusion_score": 0.4056070619373058,
+          "rerank_score": 0.26821816960595024,
+          "retrieved_by": [
+            "vector"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "cross-mini-agent-loop",
+      "query": "Use the supplied conversation memory only to resolve references in the current research question.\n\nStable research context:\nentity: mini-SWE-agent\nresearch_topic: 我正在研究 mini-SWE-agent 的 Agent loop。\n\nCurrent research question:\n继续我们之前关于这个项目的分析。",
+      "expected_source_id": "research:mini_swe_agent",
+      "expected_symbols": [
+        "DefaultAgent.run.while_loop_1"
+      ],
+      "qualified_symbols": [
+        "DefaultAgent.run.while_loop_1"
+      ],
+      "expected_file_paths": [
+        "src/minisweagent/agents/default.py"
+      ],
+      "backend": {
+        "vector_enabled": true,
+        "embedding_backend": "openai-compatible",
+        "embedding_model": "text-embedding-3-small",
+        "chroma_query_used": true,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "symbol_ranks": {
+        "DefaultAgent.run.while_loop_1": null
+      },
+      "first_expected_rank": null,
+      "any_expected_symbol_hit_at_5": false,
+      "all_expected_symbols_hit_at_5": false,
+      "top_5": [
+        {
+          "chunk_id": 5,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (for research)",
+          "symbol": "More motivation (for research)",
+          "qualified_symbol": null,
+          "final_rank": 1,
+          "final_score": 0.6346904349617639,
+          "bm25_score": 10.65406436913877,
+          "vector_score": 0.6530897796913175,
+          "fusion_score": 0.9214446948113364,
+          "rerank_score": 0.6346904349617639,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 8,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (for research)",
+          "symbol": "More motivation (for research)",
+          "qualified_symbol": null,
+          "final_rank": 2,
+          "final_score": 0.6066577892583994,
+          "bm25_score": 13.27109389472593,
+          "vector_score": 0.6378394619771703,
+          "fusion_score": 0.8917859647516128,
+          "rerank_score": 0.6066577892583994,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 12,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "Should I use SWE-agent or mini-SWE-agent?",
+          "symbol": "Should I use SWE-agent or mini-SWE-agent?",
+          "qualified_symbol": null,
+          "final_rank": 3,
+          "final_score": 0.5581065833188781,
+          "bm25_score": 8.823152486663886,
+          "vector_score": 0.6452889872089913,
+          "fusion_score": 0.8111329735942003,
+          "rerank_score": 0.5581065833188781,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 9,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (as a tool)",
+          "symbol": "More motivation (as a tool)",
+          "qualified_symbol": null,
+          "final_rank": 4,
+          "final_score": 0.5179667214616355,
+          "bm25_score": 9.65505888480511,
+          "vector_score": 0.6317969316652722,
+          "fusion_score": 0.7403666229175389,
+          "rerank_score": 0.5179667214616355,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 13,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "Should I use SWE-agent or mini-SWE-agent?",
+          "symbol": "Should I use SWE-agent or mini-SWE-agent?",
+          "qualified_symbol": null,
+          "final_rank": 5,
+          "final_score": 0.4595119491538723,
+          "bm25_score": 4.813687796849833,
+          "vector_score": 0.6380886998529105,
+          "fusion_score": 0.6396887880875229,
+          "rerank_score": 0.4595119491538723,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "cross-mini-actions",
+      "query": "Use the supplied conversation memory only to resolve references in the current research question.\n\nStable research context:\nentity: mini-SWE-agent\nresearch_topic: 我的研究主题是 mini-SWE-agent 的 action execution。\n\nCurrent research question:\n继续分析这个主题的执行路径。",
+      "expected_source_id": "research:mini_swe_agent",
+      "expected_symbols": [
+        "DefaultAgent.execute_actions"
+      ],
+      "qualified_symbols": [
+        "DefaultAgent.execute_actions"
+      ],
+      "expected_file_paths": [
+        "src/minisweagent/agents/default.py"
+      ],
+      "backend": {
+        "vector_enabled": true,
+        "embedding_backend": "openai-compatible",
+        "embedding_model": "text-embedding-3-small",
+        "chroma_query_used": true,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "symbol_ranks": {
+        "DefaultAgent.execute_actions": null
+      },
+      "first_expected_rank": null,
+      "any_expected_symbol_hit_at_5": false,
+      "all_expected_symbols_hit_at_5": false,
+      "top_5": [
+        {
+          "chunk_id": 8,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (for research)",
+          "symbol": "More motivation (for research)",
+          "qualified_symbol": null,
+          "final_rank": 1,
+          "final_score": 0.622321331170989,
+          "bm25_score": 13.262373062362126,
+          "vector_score": 0.6371686900738832,
+          "fusion_score": 0.9342346156762377,
+          "rerank_score": 0.622321331170989,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 5,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (for research)",
+          "symbol": "More motivation (for research)",
+          "qualified_symbol": null,
+          "final_rank": 2,
+          "final_score": 0.588736230542803,
+          "bm25_score": 10.6424912213517,
+          "vector_score": 0.6400413383101043,
+          "fusion_score": 0.8618925541000442,
+          "rerank_score": 0.588736230542803,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 12,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "Should I use SWE-agent or mini-SWE-agent?",
+          "symbol": "Should I use SWE-agent or mini-SWE-agent?",
+          "qualified_symbol": null,
+          "final_rank": 3,
+          "final_score": 0.525664964726126,
+          "bm25_score": 8.810696835310301,
+          "vector_score": 0.6381916276320247,
+          "fusion_score": 0.7791962775592884,
+          "rerank_score": 0.525664964726126,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 7,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (for research)",
+          "symbol": "More motivation (for research)",
+          "qualified_symbol": null,
+          "final_rank": 4,
+          "final_score": 0.4936767115852665,
+          "bm25_score": 12.196349413439947,
+          "vector_score": 0.6147005274995817,
+          "fusion_score": 0.7080472381714469,
+          "rerank_score": 0.4936767115852665,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 6,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (for research)",
+          "symbol": "More motivation (for research)",
+          "qualified_symbol": null,
+          "final_rank": 5,
+          "final_score": 0.47968968520954297,
+          "bm25_score": 11.892935304895273,
+          "vector_score": 0.6126661259512012,
+          "fusion_score": 0.6799658130034898,
+          "rerank_score": 0.47968968520954297,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "cross-mini-history",
+      "query": "Use the supplied conversation memory only to resolve references in the current research question.\n\nStable research context:\nentity: mini-SWE-agent\nresearch_topic: 我在研究 mini-SWE-agent 如何更新 message history。\n\nCurrent research question:\n继续之前的 history 更新问题。",
+      "expected_source_id": "research:mini_swe_agent",
+      "expected_symbols": [
+        "DefaultAgent.add_messages"
+      ],
+      "qualified_symbols": [
+        "DefaultAgent.add_messages"
+      ],
+      "expected_file_paths": [
+        "src/minisweagent/agents/default.py"
+      ],
+      "backend": {
+        "vector_enabled": true,
+        "embedding_backend": "openai-compatible",
+        "embedding_model": "text-embedding-3-small",
+        "chroma_query_used": true,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "symbol_ranks": {
+        "DefaultAgent.add_messages": null
+      },
+      "first_expected_rank": null,
+      "any_expected_symbol_hit_at_5": false,
+      "all_expected_symbols_hit_at_5": false,
+      "top_5": [
+        {
+          "chunk_id": 5,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (for research)",
+          "symbol": "More motivation (for research)",
+          "qualified_symbol": null,
+          "final_rank": 1,
+          "final_score": 0.5772579553757252,
+          "bm25_score": 10.6424912213517,
+          "vector_score": 0.6251201811270445,
+          "fusion_score": 0.8382070811564593,
+          "rerank_score": 0.5772579553757252,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 8,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (for research)",
+          "symbol": "More motivation (for research)",
+          "qualified_symbol": null,
+          "final_rank": 2,
+          "final_score": 0.5719103173929896,
+          "bm25_score": 13.262373062362126,
+          "vector_score": 0.617990930645154,
+          "fusion_score": 0.8392911909126773,
+          "rerank_score": 0.5719103173929896,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 13,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "Should I use SWE-agent or mini-SWE-agent?",
+          "symbol": "Should I use SWE-agent or mini-SWE-agent?",
+          "qualified_symbol": null,
+          "final_rank": 3,
+          "final_score": 0.5691937256267482,
+          "bm25_score": 9.25700825423959,
+          "vector_score": 0.62881831112148,
+          "fusion_score": 0.8369516584417371,
+          "rerank_score": 0.5691937256267482,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 6,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (for research)",
+          "symbol": "More motivation (for research)",
+          "qualified_symbol": null,
+          "final_rank": 4,
+          "final_score": 0.5273082837171568,
+          "bm25_score": 15.48689380840486,
+          "vector_score": 0.600793710144783,
+          "fusion_score": 0.7347275437664949,
+          "rerank_score": 0.5273082837171568,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 12,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "Should I use SWE-agent or mini-SWE-agent?",
+          "symbol": "Should I use SWE-agent or mini-SWE-agent?",
+          "qualified_symbol": null,
+          "final_rank": 5,
+          "final_score": 0.47159836670097655,
+          "bm25_score": 8.810696835310301,
+          "vector_score": 0.6129866812613192,
+          "fusion_score": 0.6754133584209627,
+          "rerank_score": 0.47159836670097655,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "cross-mini-environment",
+      "query": "Use the supplied conversation memory only to resolve references in the current research question.\n\nStable research context:\nentity: mini-SWE-agent\nresearch_topic: 我的项目上下文是 mini-SWE-agent 的 LocalEnvironment。\n\nCurrent research question:\n继续分析它如何执行命令。",
+      "expected_source_id": "research:mini_swe_agent",
+      "expected_symbols": [
+        "LocalEnvironment.execute"
+      ],
+      "qualified_symbols": [
+        "LocalEnvironment.execute"
+      ],
+      "expected_file_paths": [
+        "src/minisweagent/environments/local.py"
+      ],
+      "backend": {
+        "vector_enabled": true,
+        "embedding_backend": "openai-compatible",
+        "embedding_model": "text-embedding-3-small",
+        "chroma_query_used": true,
+        "bm25_used": true,
+        "fallback_used": false,
+        "fallback_reason": null
+      },
+      "symbol_ranks": {
+        "LocalEnvironment.execute": null
+      },
+      "first_expected_rank": null,
+      "any_expected_symbol_hit_at_5": false,
+      "all_expected_symbols_hit_at_5": false,
+      "top_5": [
+        {
+          "chunk_id": 8,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (for research)",
+          "symbol": "More motivation (for research)",
+          "qualified_symbol": null,
+          "final_rank": 1,
+          "final_score": 0.6488961096253633,
+          "bm25_score": 13.262373062362126,
+          "vector_score": 0.6423552953398991,
+          "fusion_score": 0.9736432740978438,
+          "rerank_score": 0.6488961096253633,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 5,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (for research)",
+          "symbol": "More motivation (for research)",
+          "qualified_symbol": null,
+          "final_rank": 2,
+          "final_score": 0.5892227103532476,
+          "bm25_score": 10.6424912213517,
+          "vector_score": 0.6400640023221557,
+          "fusion_score": 0.853314020391247,
+          "rerank_score": 0.5892227103532476,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 12,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "Should I use SWE-agent or mini-SWE-agent?",
+          "symbol": "Should I use SWE-agent or mini-SWE-agent?",
+          "qualified_symbol": null,
+          "final_rank": 3,
+          "final_score": 0.5602900829947048,
+          "bm25_score": 8.810696835310301,
+          "vector_score": 0.645025551376527,
+          "fusion_score": 0.8339669462489493,
+          "rerank_score": 0.5602900829947048,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 6,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (for research)",
+          "symbol": "More motivation (for research)",
+          "qualified_symbol": null,
+          "final_rank": 4,
+          "final_score": 0.5200992523790229,
+          "bm25_score": 11.892935304895273,
+          "vector_score": 0.6244217746222336,
+          "fusion_score": 0.7455551244978289,
+          "rerank_score": 0.5200992523790229,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        },
+        {
+          "chunk_id": 9,
+          "source_id": "research:mini_swe_agent",
+          "file_path": "README.md",
+          "section": "More motivation (as a tool)",
+          "symbol": "More motivation (as a tool)",
+          "qualified_symbol": null,
+          "final_rank": 5,
+          "final_score": 0.4793379507932276,
+          "bm25_score": 9.6445321017765,
+          "vector_score": 0.6263436142242426,
+          "fusion_score": 0.6806664847854333,
+          "rerank_score": 0.4793379507932276,
+          "retrieved_by": [
+            "bm25",
+            "vector"
+          ]
+        }
+      ]
+    }
+  ]
+}

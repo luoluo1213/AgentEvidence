@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "name": "AgentEvidence PDF/document retrieval benchmark",
+  "top_k": 5,
+  "sources": [
+    {
+      "source_id": "research:attention_pdf",
+      "document_title": "Attention Is All You Need",
+      "location": "artifacts/step10/attention-is-all-you-need.pdf",
+      "source_url": "https://arxiv.org/pdf/1706.03762",
+      "sha256": "bdfaa68d8984f0dc02beaca527b76f207d99b666d31d1da728ee0728182df697"
+    },
+    {
+      "source_id": "research:react_pdf",
+      "document_title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+      "location": "data/research_raw/react/raw.pdf",
+      "source_url": "https://arxiv.org/pdf/2210.03629",
+      "sha256": "f285b0971ae4a790e402fb93966bed3adde2cf0a04977d08b2b40d6ab0cace69"
+    },
+    {
+      "source_id": "research:reflexion_pdf",
+      "document_title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+      "location": "data/research_raw/reflexion/raw.pdf",
+      "source_url": "https://arxiv.org/pdf/2303.11366",
+      "sha256": "6059b6f89fea9959bd3dab553fbb97756a3dfb1b15e3cbab2fbf3ab6664333bd"
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "attention-scaling-factor",
+      "query": "What scaling factor is applied to query-key dot products before softmax?",
+      "query_type": "lexical",
+      "expected_source_id": "research:attention_pdf",
+      "expected_pages": [4],
+      "expected_sections": ["Page 4"],
+      "expected_evidence_anchors": ["divide each by √dk", "apply a softmax function"]
+    },
+    {
+      "case_id": "attention-label-smoothing",
+      "query": "What label smoothing value was used during Transformer training?",
+      "query_type": "lexical",
+      "expected_source_id": "research:attention_pdf",
+      "expected_pages": [8],
+      "expected_sections": ["Page 8"],
+      "expected_evidence_anchors": ["label smoothing of value ϵls = 0.1"]
+    },
+    {
+      "case_id": "attention-position-order",
+      "query": "How does the Transformer represent token order despite having neither recurrence nor convolution?",
+      "query_type": "paraphrase",
+      "expected_source_id": "research:attention_pdf",
+      "expected_pages": [6],
+      "expected_sections": ["Page 6"],
+      "expected_evidence_anchors": ["contains no recurrence and no convolution", "order of the sequence"]
+    },
+    {
+      "case_id": "attention-sinusoidal-encoding",
+      "query": "Which fixed functions encode positions at different frequencies?",
+      "query_type": "paraphrase",
+      "expected_source_id": "research:attention_pdf",
+      "expected_pages": [6],
+      "expected_sections": ["Page 6"],
+      "expected_evidence_anchors": ["use sine and cosine functions of different frequencies"]
+    },
+    {
+      "case_id": "attention-multihead-combination",
+      "query": "How are the parallel attention heads combined, and how many heads does the base model use?",
+      "query_type": "method",
+      "expected_source_id": "research:attention_pdf",
+      "expected_pages": [5],
+      "expected_sections": ["Page 5"],
+      "expected_evidence_anchors": ["MultiHead(Q, K, V) = Concat", "h = 8 parallel attention layers"]
+    },
+    {
+      "case_id": "attention-encoder-sublayers",
+      "query": "What are the two encoder sub-layers and how are residual connections normalized?",
+      "query_type": "method",
+      "expected_source_id": "research:attention_pdf",
+      "expected_pages": [3],
+      "expected_sections": ["Page 3"],
+      "expected_evidence_anchors": ["multi-head self-attention mechanism", "fully connected feed-forward network", "LayerNorm(x + Sublayer(x))"]
+    },
+    {
+      "case_id": "react-four-benchmarks",
+      "query": "Which four benchmarks are used to evaluate ReAct?",
+      "query_type": "lexical",
+      "expected_source_id": "research:react_pdf",
+      "expected_pages": [3],
+      "expected_sections": ["Page 3"],
+      "expected_evidence_anchors": ["four diverse benchmarks", "HotPotQA", "Fever", "ALFWorld", "WebShop"]
+    },
+    {
+      "case_id": "react-success-improvements",
+      "query": "What absolute success-rate improvements does ReAct report on ALFWorld and WebShop?",
+      "query_type": "lexical",
+      "expected_source_id": "research:react_pdf",
+      "expected_pages": [1],
+      "expected_sections": ["Page 1"],
+      "expected_evidence_anchors": ["ALFWorld and WebShop", "34% and 10% respectively"]
+    },
+    {
+      "case_id": "react-hallucination-grounding",
+      "query": "How does ReAct reduce hallucination and error propagation in question answering?",
+      "query_type": "paraphrase",
+      "expected_source_id": "research:react_pdf",
+      "expected_pages": [1],
+      "expected_sections": ["Page 1"],
+      "expected_evidence_anchors": ["hallucination and error propagation", "interacting with a simple Wikipedia API"]
+    },
+    {
+      "case_id": "react-reason-action-synergy",
+      "query": "Why does alternating reasoning with actions help both planning and information gathering?",
+      "query_type": "paraphrase",
+      "expected_source_id": "research:react_pdf",
+      "expected_pages": [1],
+      "expected_sections": ["Page 1"],
+      "expected_evidence_anchors": ["reasoning traces help the model induce, track, and update action plans", "gather additional information"]
+    },
+    {
+      "case_id": "react-dynamic-loop",
+      "query": "How does ReAct connect reasoning-to-action and action-to-reasoning in its interaction loop?",
+      "query_type": "method",
+      "expected_source_id": "research:react_pdf",
+      "expected_pages": [2],
+      "expected_sections": ["Page 2"],
+      "expected_evidence_anchors": ["reason to act", "act to reason", "interleaved manner"]
+    },
+    {
+      "case_id": "react-trajectory-components",
+      "query": "Which trajectory elements are generated by the model and which come from the environment?",
+      "query_type": "method",
+      "expected_source_id": "research:react_pdf",
+      "expected_pages": [2],
+      "expected_sections": ["Page 2"],
+      "expected_evidence_anchors": ["generated by the model (Act, Thought)", "environment (Obs)"]
+    },
+    {
+      "case_id": "reflexion-three-models",
+      "query": "What three models make up the modular Reflexion formulation?",
+      "query_type": "lexical",
+      "expected_source_id": "research:reflexion_pdf",
+      "expected_pages": [3],
+      "expected_sections": ["Page 3"],
+      "expected_evidence_anchors": ["three distinct models", "an Actor", "anEvaluator model", "a Self-Reflection model"]
+    },
+    {
+      "case_id": "reflexion-memory-types",
+      "query": "What serves as short-term memory and what is stored in long-term memory in Reflexion?",
+      "query_type": "lexical",
+      "expected_source_id": "research:reflexion_pdf",
+      "expected_pages": [5],
+      "expected_sections": ["Page 5"],
+      "expected_evidence_anchors": ["trajectory history serves as the short-term memory", "stored in long-term memory"]
+    },
+    {
+      "case_id": "reflexion-feedback-conversion",
+      "query": "How is a sparse success or failure signal turned into guidance for the next episode?",
+      "query_type": "paraphrase",
+      "expected_source_id": "research:reflexion_pdf",
+      "expected_pages": [2],
+      "expected_sections": ["Page 2"],
+      "expected_evidence_anchors": ["converts binary or scalar feedback", "textual summary", "next episode"]
+    },
+    {
+      "case_id": "reflexion-episodic-benefit",
+      "query": "Why is verbal reinforcement useful for remembering prior experience and guiding future actions?",
+      "query_type": "paraphrase",
+      "expected_source_id": "research:reflexion_pdf",
+      "expected_pages": [2],
+      "expected_sections": ["Page 2"],
+      "expected_evidence_anchors": ["interpretable form of episodic memory", "explicit hints for actions in future episodes"]
+    },
+    {
+      "case_id": "reflexion-optimization-loop",
+      "query": "How do the Actor, Evaluator, Self-Reflection model, and memory interact across trials?",
+      "query_type": "method",
+      "expected_source_id": "research:reflexion_pdf",
+      "expected_pages": [5],
+      "expected_sections": ["Page 5"],
+      "expected_evidence_anchors": ["Self-Reflection model analyzes", "stored in the memory", "work together through trials in a loop"]
+    },
+    {
+      "case_id": "reflexion-self-reflection-inputs",
+      "query": "What information does the self-reflection model use to produce feedback, and where is that feedback stored?",
+      "query_type": "method",
+      "expected_source_id": "research:reflexion_pdf",
+      "expected_pages": [4],
+      "expected_sections": ["Page 4"],
+      "expected_evidence_anchors": ["binary success status", "current trajectory", "persistent memory", "stored in the agent’s memory"]
+    }
+  ]
+}

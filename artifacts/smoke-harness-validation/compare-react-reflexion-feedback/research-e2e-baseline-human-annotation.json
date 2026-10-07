@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "status": "PENDING HUMAN REVIEW",
+  "labels": [
+    "correct",
+    "incorrect",
+    "partial"
+  ],
+  "run_variant": "baseline",
+  "cases": [
+    {
+      "id": "compare-react-reflexion-feedback",
+      "query": "比较 ReAct 和 Reflexion 在利用反馈改进智能体行为方面的主要差异。",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "observation",
+        "verbal reflection",
+        "trial"
+      ],
+      "correctness": null,
+      "notes": ""
+    }
+  ]
+}

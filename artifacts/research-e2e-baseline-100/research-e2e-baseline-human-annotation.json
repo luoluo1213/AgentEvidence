@@ -1,0 +1,1156 @@
+{
+  "schema_version": 1,
+  "status": "PENDING HUMAN REVIEW",
+  "labels": [
+    "correct",
+    "incorrect",
+    "partial"
+  ],
+  "run_variant": "baseline",
+  "cases": [
+    {
+      "id": "single-attention-scaling",
+      "query": "为什么 scaled dot-product attention 要除以 sqrt(d_k)？",
+      "answer": "Scaled Dot-Product Attention 在计算注意力权重时，先计算查询 Q 与所有键 K 的点积，再除以 √d_k，然后才送入 softmax。论文给出的原因是：当 d_k 较大时，点积 QK^T 的数值会变大，导致 softmax 进入梯度极小的区域，不利于学习；除以 √d_k 是为了抵消这种放大效应。更具体地，论文假设 q 和 k 的分量是均值为 0、方差为 1 的独立随机变量，则 q·k 的方差为 d_k，说明点积的典型幅度会随 d_k 增大而增大。因此，缩放因子 1/√d_k 可以让点积的尺度保持稳定，避免 softmax 饱和。论文还比较了 additive attention 和 dot-product attention：在 d_k 较小时二者表现相似，但在 d_k 较大时，未缩放的 dot-product attention 不如 additive attention，作者怀疑原因正是上述点积过大导致的梯度问题。",
+      "expected_concepts": [
+        "sqrt(d_k)",
+        "softmax",
+        "dot product",
+        "gradient"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-attention-position",
+      "query": "Transformer 没有循环和卷积时，怎样表示序列中 token 的顺序？",
+      "answer": "Transformer 没有循环和卷积，因此其自注意力计算本身并不天然携带序列顺序信息。论文在第 3.5 节引入“位置编码”（Positional Encoding）来弥补这一点：为了让模型能够利用序列顺序，必须注入关于序列中 token 的相对或绝对位置的信息。也就是说，顺序信息不是由循环逐步计算或卷积局部结构隐式提供的，而是通过显式加入位置信息来表示。提供的证据只覆盖到位置编码的引入动机，没有给出具体的编码公式或注入方式，因此无法进一步说明实现细节。",
+      "expected_concepts": [
+        "positional encoding",
+        "sine",
+        "cosine"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-attention-heads",
+      "query": "多头注意力如何组合并行 attention heads，base model 使用多少个 heads？",
+      "answer": "多头注意力通过如下方式组合并行的 attention heads：它不是只使用一个 d_model 维的注意力函数，而是将 query、key、value 分别用 h 组不同的可学习线性投影映射到 d_k、d_k、d_v 维；随后每个 head 并行执行注意力计算；h 个 head 的输出被拼接（Concat）起来，再用输出投影矩阵 W^O 做一次线性投影，得到最终输出。公式上，MultiHead(Q,K,V)=Concat(head_1,...,head_h)W^O，其中 head_i=Attention(QW_i^Q,KW_i^K,VW_i^V)。这种设计使模型能在不同表示子空间中同时关注不同位置的信息，单个 head 会因为平均而削弱这种能力；不同 head 也会学到不同的行为。根据所给论文设置，该工作使用 h=8 个并行 attention heads（文中称为 parallel attention layers/heads），每个 head 的 d_k=d_v=d_model/h=64。",
+      "expected_concepts": [
+        "MultiHead",
+        "Concat",
+        "8"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-react-interleave",
+      "query": "ReAct 如何交错进行推理和行动，环境反馈起什么作用？",
+      "answer": "关于 ReAct 如何交错进行推理和行动：ReAct 提示语言模型以交错方式同时生成言语推理轨迹和与任务相关的动作，而不是只进行一段孤立、固定的推理。这使得模型能够动态推理，以创建、维持和调整用于行动的高层计划（reason to act），同时也能在动作执行过程中与外部环境交互（act to reason），例如访问 Wikipedia 并将额外信息纳入推理。具体实现上，ReAct 把智能体的动作空间扩展为 A∪L，其中 L 是语言空间，因此自然语言推理本身可以作为一种动作进入同一轨迹，与外部动作交替出现。关于环境反馈的作用：模型动作产生的观察（Obs）被整合成连贯的输入流，与动作一起构成轨迹上下文，供模型进行更准确的后续推理和决策；如果没有正确理解这些观察，模型就可能产生错误动作。因此，环境反馈不只是被忽略的执行结果，而是成为后续推理和最终行动的信息来源与约束。这种机制也解释了 ReAct 相对于仅行动的方法（Act）更优：推理指导行动，尤其在综合最终答案时效果更明显，并且这类交织的轨迹可以被检查和编辑，纠正幻觉性思考后即可产生合理的推理与行动。",
+      "expected_concepts": [
+        "thought",
+        "action",
+        "observation",
+        "interleave"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-react-trajectory",
+      "query": "ReAct 的 trajectory 中，哪些元素由模型生成，哪些来自环境？",
+      "answer": "在 ReAct 的 trajectory 中，模型与环境各自贡献不同元素。模型生成的是语言推理痕迹/思考（thoughts）和动作（actions）：ReAct 提示 LLM 以交错方式生成 verbal reasoning traces 和 actions，并由语言模型自行决定 thoughts 和 actions 的出现时机；轨迹由多个 thought-action-observation 步骤组成。环境侧提供的是观察/额外信息：ReAct 通过与环境（如 Wikipedia）交互把外部信息纳入推理，模型动作及其对应观察被整合成连贯输入流反馈给模型，因此观察来自外部环境交互。",
+      "expected_concepts": [
+        "Thought",
+        "Act",
+        "Obs"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-react-grounding",
+      "query": "ReAct 在问答任务中如何通过外部信息减少幻觉？",
+      "answer": "ReAct 减少问答任务中幻觉的核心机制，是让语言模型交替生成推理轨迹（thought）和任务相关动作（action），从而把外部信息引入推理过程。具体而言，在“推理到行动”方向上，模型可以动态推理，创建、维持并调整高层计划；在“行动到推理”方向上，模型与外部环境（如 Wikipedia API）交互，把检索到的信息纳入后续推理。在 HotpotQA 和 Fever 上，ReAct 正是通过这种与 Wikipedia API 的交互，克服了 chain-of-thought 推理中常见的幻觉和错误传播问题。对比实验更直接显示：Standard 和 CoT 会因幻觉给出错误答案；Act 虽然能访问真实网络，却因缺少推理来引导如何交互而失败；只有 ReAct 能检索到最新信息并给出合理答案。同时，ReAct 优于 Act，说明推理能够指导行动，尤其是在综合最终答案时。需要指出的是，论文也展示了一个 ReAct 轨迹因幻觉性思考而失败的案例，经过人类编辑两个思考后才恢复并成功，说明 ReAct 并未完全杜绝幻觉，但其结构化的推理轨迹使幻觉更容易被检查和修正。",
+      "expected_concepts": [
+        "Wikipedia",
+        "hallucination",
+        "grounding"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-reflexion-verbal-memory",
+      "query": "Reflexion 如何利用语言反馈和情景记忆，在多次 trial 之间改进行为？",
+      "answer": "Reflexion 的核心是用“言语强化”代替权重更新：它不通过更新模型参数，而是通过语言反馈来强化语言智能体。具体来说，Reflexion 智能体会对任务反馈信号进行口头反思，并将自己的反思文本保存在情景记忆缓冲区中；这些反思文本会在后续 trial 中被用作额外上下文，从而引导更好的决策。环境给出的二元或标量反馈也会被转换为文本摘要形式的言语反馈，并在下一 episode 中作为 LLM 智能体的额外上下文加入。该框架能够纳入不同类型和不同来源的反馈信号，例如标量值或自由形式语言、外部反馈或内部模拟反馈。在实现层面，Reflexion 编程任务的 Actor 生成形式按照“指令—函数实现—单元测试反馈—自我反思—下一条函数实现指令”的顺序组织，使自我反思成为下一次实现指令的上下文；自我反思生成形式包含指令、函数实现和单元测试反馈，并且自我反思指令会向模型提供之前的实现、一系列单元测试结果以及之前的自我反思。作者还通过消融实验分离自我反思步骤在推理中的作用，并将 Reflexion 与情景记忆消融进行比较。经验结果表明，Reflexion 利用言语强化帮助智能体从过去的错误中学习，通过自我反思在少量 trial 中学习复杂任务，并显著优于当前广泛使用的决策方法。其提出的是“言语强化”新范式，将策略参数化为智能体记忆编码与 LLM 参数选择的组合。",
+      "expected_concepts": [
+        "verbal",
+        "episodic memory",
+        "trial",
+        "self-reflection"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-reflexion-memory-types",
+      "query": "Reflexion 的短期记忆和长期记忆分别保存什么？",
+      "answer": "根据现有证据，Reflexion 的短期记忆与长期记忆保存的内容如下。在强化学习（RL）设置中，短期记忆保存的是轨迹历史（trajectory history），即智能体交互产生的轨迹记录；长期记忆保存的是 Self-Reflection 模型的输出，也就是自我反思文本。具体来说，Self-Reflection 模型会基于稀疏奖励信号、当前轨迹和已有的持久记忆生成言语化的、比标量奖励更具体的反馈，并将该反馈存储在智能体的记忆（mem）中；相应地，Reflexion 将反思文本维护在 episodic memory buffer 中。在实现层面，长期记忆被限制为具有最大容量的滑动窗口，智能体记忆会被截断为最近 3 条自我反思（经验）。推理时，Actor 会同时以短期和长期记忆为条件来做出决策。",
+      "expected_concepts": [
+        "trajectory",
+        "short-term",
+        "long-term",
+        "reflection"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-reflexion-three-models",
+      "query": "Reflexion 中 Actor、Evaluator 和 Self-Reflection 如何跨 trial 协作？",
+      "answer": "Reflexion 将 Actor、Evaluator 和 Self-Reflection 组织成一个模块化的迭代优化系统：Actor 生成文本和动作，Evaluator 对 Actor 的输出进行评分，Self-Reflection 生成言语强化线索以帮助 Actor 自我改进。三者跨 trial 的协作表现为“生成—评估—反思—记忆—重试”的循环。初始 trial 中，Actor 与环境交互产生轨迹 τ0，Evaluator 计算标量奖励 r0 = Me(τ0)，该奖励随任务表现提升而提高。由于标量奖励不足以直接指导 LLM 改进，Self-Reflection 分析 {τ0, r0}，生成言语经验反馈 sr0 并存入记忆 mem。后续每个 trial 产生的 srt 都会追加到 mem；为了不超过 LLM 上下文限制，mem 通常只保留最近 Ω 条经验，Ω 一般设为 1–3。在下一 trial，Actor 依据策略 πθ(ai|si)（θ={Ma, mem}）以及短时/长时记忆作出决策，再次生成轨迹；随后 Evaluator 再次评分、Self-Reflection 再次反思，循环直到 Evaluator 判定 τt 正确或达到最大 trial 数。与 baseline 跳过自我反思、直接重置环境不同，Reflexion 会利用自我反思定位错误、更新记忆，再重置环境开始新 trial；为避免过长 prompt，记忆截断为最近 3 条反思。编程任务中的生成形式也体现了这一协作：Actor 的生成包括指令、函数实现、单元测试反馈、自我反思和下一函数实现指令；Self-Reflection 提示会提供先前函数实现、单元测试结果和自我反思。",
+      "expected_concepts": [
+        "Actor",
+        "Evaluator",
+        "Self-Reflection",
+        "memory"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-react-reflexion-feedback",
+      "query": "比较 ReAct 和 Reflexion 在利用反馈改进智能体行为方面的主要差异。",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "observation",
+        "verbal reflection",
+        "trial"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-react-reflexion-memory",
+      "query": "比较 ReAct 的 trajectory 与 Reflexion 的情景记忆：各保存什么，又在什么时间尺度上被复用？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "trajectory",
+        "episodic memory",
+        "episode"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-react-reflexion-trials",
+      "query": "ReAct 和 Reflexion 在跨 trial 使用反馈、而不是只在单条 trajectory 内使用反馈上有何不同？",
+      "answer": "在提供的证据中，ReAct 的反馈/纠错主要体现在单条 trajectory 内部：ReAct 轨迹由 thought 和 action 组成，当轨迹因 hallucinating thought 失败时，人类通过编辑该轨迹中的两个 thought（Act 17、Act 23）就能让同一条 trajectory 产生正确的推理痕迹和动作并成功。ReAct 证据还报告了多个控制 trial 的成功率差异，并指出 ReAct-IM 在单条轨迹中常遇到子目标完成判断错误、下一子目标选择错误和物品位置常识缺乏等问题；这些材料没有显示 ReAct 会把一次 trial 的反馈写成反思、存入记忆并用于下一 trial 的跨 trial 反馈机制。相比之下，Reflexion 明确是跨 trial 的迭代优化：第一次 trial 中 Actor 产生轨迹，Evaluator 给出标量奖励，随后 Self-Reflection 模型分析轨迹与奖励并生成 verbal experience feedback 存入 memory；后续每次 trial 的反馈也追加到 memory，实践中截断为最近 3 条反思。机制上，Reflexion 把当前 trajectory 历史作为短期记忆、Self-Reflection 输出作为长期记忆，二者共同为 Actor 提供受多个 trial 教训影响的上下文；而 ReAct 证据中的纠错仍在同一条 trajectory 内完成。因此，核心差异是：ReAct 的证据没有显示跨 trial 反馈，其反馈/修正位于单条 trajectory 内；Reflexion 的关键正在于跨 trial 反馈，即把奖励信号语言化、持久化到 memory，并在环境重置后的新 trial 中继续影响决策。实验对比也显示 ReAct+Reflexion 随 trial 增加解决比例高于 ReAct-only，ReAct-only 在 trial 6 与 7 之间增长停滞，而加入 Reflexion 可在连续 12 个 trial 中学习解决更多任务。",
+      "expected_concepts": [
+        "within-trajectory",
+        "across trials",
+        "reflection"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-react-reflexion-feedback-timing",
+      "query": "比较 ReAct 与 Reflexion：环境或 evaluator 反馈分别在什么时候进入下一步决策？",
+      "answer": "在 ReAct 中，环境反馈进入下一步决策的阶段是轨迹内部的每个动作之后：LLM 以交错方式生成言语推理轨迹和动作，与外部环境交互后获得观察，这些观察被整合进连贯的输入流，成为后续推理和决策的附加信息。因此，ReAct 的环境反馈以“动作—观察”文本流的形式即时注入，而不是等到整条轨迹结束后才反馈。在 Reflexion 中，evaluator 反馈进入下一步决策的阶段在整条 trial 结束之后、下一轮 trial 开始之前：Actor 先产生轨迹 τt，Evaluator 给出标量评分 rt=Me(τt)，随后 Self-Reflection 分析 {τt, rt} 生成言语化经验总结 srt 并写入记忆 mem；这些记忆在后续 trial 中为 Actor 提供额外上下文。也就是说，evaluator 反馈先被放大为语言反思，再通过 episodic memory 跨 trial 影响下一轮决策。二者共同点在于都把外部/评价信号转成文本上下文来改善后续决策；关键差异是 ReAct 的环境反馈是步骤级、轨迹内即时注入，而 Reflexion 的 evaluator 反馈是 trial 级、轨迹间延迟注入，中间增加了 Evaluator 评分和 Self-Reflection 记忆两个处理阶段。",
+      "expected_concepts": [
+        "observation",
+        "next episode",
+        "evaluator"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "session-react-feedback",
+      "query": "它的环境反馈具体起什么作用？",
+      "answer": "在 ReAct 中，环境反馈（observation）是动作执行后由环境返回并重新进入模型上下文的信息。其作用首先体现在结构上：ReAct 的轨迹由多轮 thought-action-observation 交替组成，observation 是这一循环中的关键输入环节。其次，它承担“act to reason”功能：模型通过与环境（如 Wikipedia）交互，把 observation 中的额外信息纳入推理，同时用推理来创建、维持和调整行动计划。第三，ReAct 将动作及其对应 observation 整合为连贯输入流，使模型能更准确地推理，并支持交互式决策等超越纯推理的任务。具体示例也显示，observation 会直接驱动后续 thought 和最终判断：例如搜索结果使模型确认某影片是电影并回答 SUPPORTS；当搜索结果显示影片年份是 2007 而非 2010 时，模型据此改判 REFUTES。同时，环境反馈的作用不能脱离内部推理：ReAct 优于仅行动的 Act 和 IM 式密集外部反馈提示，说明外部反馈需要与推理轨迹结合，而不能简单替代内部推理。",
+      "expected_concepts": [
+        "observation",
+        "reason",
+        "act"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "session-reflexion-long-term",
+      "query": "长期记忆里存的是什么？",
+      "answer": "根据提供的证据，Reflexion 的长期记忆里具体存储的是 Self-Reflection 模型生成的言语自我反思，也就是把任务反馈信号转化后产生的反思性文本，而不是原始轨迹或模型权重。原始轨迹历史在 Reflexion 的记忆结构中属于短期记忆。长期记忆的作用是保存经过多个 trial 提炼出的重要经验，使 Actor 在后续推理时能够同时利用短期细节和长期教训。实现上，本研究把长期记忆限制为一个具有最大容量的滑动窗口，作者建议未来可扩展为向量嵌入数据库或传统 SQL 数据库等更高级的结构。",
+      "expected_concepts": [
+        "self-reflection",
+        "long-term"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "cross-session-attention-scaling",
+      "query": "继续之前的主题：它为什么要除以 sqrt(d_k)？",
+      "answer": "在《Attention Is All You Need》提出的 Transformer 中，缩放点积注意力会在对 query 和 key 做点积后除以 sqrt(d_k)，再送入 softmax。论文给出的原因是：当 d_k 较大时，点积的幅值会变大，从而把 softmax 推到梯度极小的区域；因此用 1/sqrt(d_k) 对点积进行缩放，以抵消这种效应。论文进一步用随机变量说明了点积为什么会变大：假设 q 和 k 的各个分量是均值为 0、方差为 1 的独立随机变量，那么 q·k = Σ q_i k_i 的均值为 0、方差为 d_k。也就是说，如果不除以 sqrt(d_k)，点积的方差会随 d_k 线性增长，点积值更容易偏离到较大幅值，进而使 softmax 进入梯度极小的饱和区域；除以 sqrt(d_k) 正是为了抵消这种随维度增长的尺度变化。论文还指出，在 d_k 较小时，加性注意力和点积注意力表现相似，但在 d_k 较大时，加性注意力优于未缩放的点积注意力。",
+      "expected_concepts": [
+        "softmax",
+        "dot product"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "cross-session-reflexion-next-trial",
+      "query": "继续我们之前的分析：它如何把失败变成下一 trial 可用的信息？",
+      "answer": "这里所分析的对象是 Reflexion 框架。它的核心机制不是直接复用标量失败信号，而是通过自我反思模型把失败信号转化为自然语言经验并写入记忆，使失败成为后续 trial 可以条件化使用的信息。具体来说，环境先给出稀疏的二元成功/失败反馈，例如编程任务中用精确匹配打分给出二元成功信号，决策任务中也以成功/失败作为信号。不同实现还可以使用预定义启发式或自评估，但共同点是把评估信号放大为自然语言经验摘要。自我反思模型接收这个稀疏奖励、当前轨迹和持久记忆，生成比标量奖励更具体、细致的反馈并存入记忆。在多步决策任务中，失败使智能体推断某个具体动作导致了后续错误动作，智能体用自然语言说明本来应采取替代动作，并假设替代动作会带来不同的后续动作，这一经验被写入记忆。后续 trial 中，Actor 决策时条件于短期和长期记忆；这些长期记忆将失败的长轨迹蒸馏为相关经验，作为自我提示使用。如果早期轨迹中有错误，智能体可以据此建议新动作或新长期计划，并在下一时间步改选替代动作。在 AlfWorld 的设置中，每个 trial 后使用环境精确匹配给二元信号，随后用自我反思循环放大该信号，记忆大小设为 3 个经验。在编程任务中，失败单元测试套件评估之后存在自然语言解释步骤；消融实验表明，若省略这一步，智能体需要同时承担全部失败单元测试的错误识别与实现改进。基线的 ReAct-only、CoT-only 和 CoT(GT)-only 无法在后续 trial 上以概率方式改善失败任务，而 Reflexion 通过收集经验并重试直到连续三次失败，可以改善。综上，失败变成下一 trial 可用信息的关键路径是：二元失败信号经过自我反思生成自然语言反馈，提炼为长期记忆中的经验或自我提示，并在下一 trial 中被条件化利用。",
+      "expected_concepts": [
+        "verbal",
+        "memory",
+        "trial"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-attention-encoder-layers",
+      "query": "Transformer encoder 每层包含哪两个子层，残差连接与 LayerNorm 如何组合？",
+      "answer": "Transformer 编码器由 N=6 个相同层堆叠而成，每层包含两个子层。第一个子层是多头自注意力机制，第二个子层是逐位置的全连接前馈网络。作者对这两个子层都采用了残差连接，并在残差相加之后执行层归一化，即每个子层的输出为 LayerNorm(x + Sublayer(x))，其中 Sublayer(x) 是该子层本身实现的函数；因此组合顺序是先加残差、后做 LayerNorm。为保证残差连接可行，所有子层以及嵌入层的输出维度都被设置为 dmodel=512。在编码器的自注意力子层中，query、key、value 都来自编码器上一层的输出，每个位置可以关注编码器上一层中的所有位置。",
+      "expected_concepts": [
+        "multi-head self-attention",
+        "feed-forward network",
+        "residual connection",
+        "LayerNorm"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-attention-decoder-mask",
+      "query": "Transformer decoder 为什么要对 self-attention 做 masking，它阻止了什么信息泄漏？",
+      "answer": "1. 为什么要 mask：Transformer decoder 的 self-attention 被 mask，是为了保持自回归（auto-regressive）生成性质。论文说明，decoder stack 中的 self-attention 子层被修改为“防止位置关注后续位置”，并且这种 masking 与输出 embedding 偏移一个位置相结合，确保对位置 i 的预测只能依赖位置小于 i 的已知输出。进一步解释是：需要阻止 decoder 中的 leftward information flow，以保持 auto-regressive property；实现方式是在 scaled dot-product attention 中把 softmax 输入中对应非法连接的值设为 −∞。2. 阻止了什么信息泄漏：masked self-attention 阻止的是未来位置信息向当前位置泄漏。decoder 的 self-attention 层只允许每个位置关注到包括自身在内的左侧全部位置，而不能关注 i 之后的后续位置，因此当前预测无法提前看到后面的已知输出。这避免当前预测依赖尚未产生的未来 target 信息，从而保持自回归性质。需要说明，这种 mask 只针对 decoder 自身的 self-attention；decoder 的 encoder-decoder attention 仍可让每个位置关注 encoder 输入序列的全部位置。",
+      "expected_concepts": [
+        "masking",
+        "subsequent positions",
+        "autoregressive",
+        "decoder"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-attention-feed-forward",
+      "query": "Transformer 的 position-wise feed-forward network 如何作用于每个位置？",
+      "answer": "在 Transformer 中，position-wise feed-forward network（FFN）是编码器和解码器每一层中、位于多头自注意力之后的第二个子层。它作用于每个位置的方式是：对序列中每个位置的特征向量单独且完全相同地应用同一个前馈变换，不跨位置混合信息。具体来说，给定某个位置的输入 x，FFN 先进行第一层线性变换 xW1+b1，再施加 ReLU 激活，最后进行第二层线性变换，公式为：FFN(x) = max(0, xW1+b1)W2+b2。在同一层内，所有位置共享同一组线性变换参数 W1、b1、W2、b2；不同层之间则使用不同的参数。默认情况下，输入和输出维度为 dmodel=512，内层维度为 dff=2048。这种逐位置前馈网络也可以等价地描述为两个卷积核大小为 1 的卷积。在整体架构中，该子层还被残差连接和 LayerNorm 包裹，输出形式为 LayerNorm(x + Sublayer(x))。",
+      "expected_concepts": [
+        "two linear transformations",
+        "ReLU",
+        "same parameters",
+        "different positions"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-attention-complexity",
+      "query": "论文如何比较 self-attention 与 recurrent layer 的并行性和路径长度？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "computational complexity",
+        "sequential operations",
+        "maximum path length",
+        "self-attention"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-react-four-benchmarks",
+      "query": "ReAct 论文使用哪四个 benchmark 覆盖问答与交互决策任务？",
+      "answer": "ReAct 论文使用了四个 benchmark：HotPotQA、Fever、ALFWorld 和 WebShop。其中，HotPotQA 用于问答任务，Fever 用于事实验证任务，ALFWorld 和 WebShop 用于交互式决策任务。",
+      "expected_concepts": [
+        "HotPotQA",
+        "FEVER",
+        "ALFWorld",
+        "WebShop"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-react-action-space",
+      "query": "ReAct 在 HotPotQA/FEVER 中通过哪些 Wikipedia API action 获取或定位信息？",
+      "answer": "在 HotPotQA 和 FEVER 上，ReAct 通过一个可交互的 Wikipedia API 获取和定位信息，以支持推理并决定下一步检索目标。根据论文对动作空间的定义，该 Wikipedia API 包含三类 action：search[entity]、lookup[string] 和 finish[answer]。其中，真正用于获取或定位信息的是 search[entity] 和 lookup[string]：search[entity] 会在对应实体维基页面存在时返回该页面前 5 个句子，否则从维基百科搜索引擎返回 top-5 个相似实体；lookup[string] 会在页面中查找包含指定字符串的位置，并返回该字符串所在处的下一个句子，模拟浏览器 Ctrl+F 功能。finish[answer] 则用于以当前答案结束任务，不承担检索或定位信息的职能。",
+      "expected_concepts": [
+        "search",
+        "lookup",
+        "finish",
+        "Wikipedia API"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-react-sparse-thoughts",
+      "query": "ReAct 在交互式决策任务中为什么采用稀疏 reasoning，而不是每一步都生成 thought？",
+      "answer": "ReAct 在交互式决策任务中采用稀疏 reasoning，并不是每一步都生成 thought，其核心设计理由是：thought 通常只出现在轨迹中最相关的位置，因此 ReAct 让语言模型自行决定 thoughts 和 actions 的异步出现，而不是人为规定固定节奏。ReAct 以交错方式提示模型生成言语推理轨迹和动作，使模型能动态推理以创建、维持和调整高层计划，同时通过与环境交互把外部信息纳入推理；这种灵活的 thought space 和 thought-action occurrence format 也使它适应不同动作空间和推理需求。消融实验进一步显示，与采用密集外部反馈的 IM 式 prompting 相比，ReAct 的总体成功率为 71，而 ReAct-IM 为 53，六个任务中有五个具有一致优势，说明在交互决策中稀疏的内部推理相比密集外部反馈具有优势。",
+      "expected_concepts": [
+        "sparse reasoning",
+        "decision making",
+        "action space",
+        "trajectory"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-react-failure-modes",
+      "query": "ReAct 论文分析了哪些主要失败模式，推理错误与搜索信息不足如何影响结果？",
+      "answer": "根据 ReAct 论文提供的证据，论文在 HotpotQA 上对 ReAct 与 CoT 各 50 条正确和错误轨迹（共 200 条）进行成功与失败模式的人工标注。整体上，ReAct 在 Fever 上优于 CoT（60.9 vs 56.3），而在 HotpotQA 上略低（27.4 vs 29.4）。主要失败模式可归纳为：\n\n1. 幻觉：幻觉对 CoT 是严重问题，并不是 ReAct 的主要失败模式。CoT 在成功模式中的假阳性率为 14%，明显高于 ReAct 的 6%；幻觉占 CoT 主要失败模式的 56%。ReAct 由于能访问外部知识库，其轨迹更基于事实、更可信，因此幻觉类错误相对较少。\n\n2. 推理错误：ReAct 的交错“推理—行动—观察”结构虽然提高了可靠性与可信度，但这种结构约束也降低了推理步骤的灵活性，使 ReAct 的推理错误率高于 CoT。ReAct 还有一种特有的高频错误，即重复生成上一轮想法和动作、无法跳出循环；论文将其归为推理错误，因为模型未能推理出正确的下一步行动。\n\n3. 搜索信息不足：论文明确指出，对 ReAct 而言，通过搜索成功获取有信息量的知识至关重要。在 Fever 这类任务中，支持与反驳的证据差异可能很小，因此能否检索到准确、最新的知识对判断至关重要；如果搜索不能提供有信息量的知识，ReAct 就缺少做出精细判断所需的事实依据。\n\n4. 消融与基线中的失败模式：ReAct-IM 常因缺乏高层目标分解而错误判断子目标是否完成或下一子目标是什么，也因缺乏常识推理而难以确定 ALFWorld 中物品的位置；完全不加思考的 Act 则无法正确分解目标或跟踪当前环境状态。ReAct 相较 ReAct-IM 总体成功率为 71 对 53，并在六项任务中五项占优。",
+      "expected_concepts": [
+        "reasoning error",
+        "search error",
+        "hallucination",
+        "failure modes"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-reflexion-feedback-types",
+      "query": "Reflexion 的 Evaluator 可以提供哪些形式的反馈，Self-Reflection 如何使用它？",
+      "answer": "根据所给证据，Reflexion 的 Evaluator 被定义为评估 Actor 生成输出质量的组件。就形式化过程而言，Evaluator 提供的反馈明确是标量奖励/分数：在第一次试验中 Actor 生成轨迹 τ0，Evaluator 按 rt = Me(τ0) 给出分数 r0，且该 rt 仅是随任务特定表现提升而改善的标量奖励。也就是说，证据中直接与 Evaluator 绑定的反馈形式是标量奖励。与此同时，论文在总体说明中指出 Reflexion 可灵活纳入多种类型和来源的反馈信号，包括标量值或自由形式语言、外部或内部模拟的反馈，并会将二元或标量环境反馈转换为文本总结。\\n\\nSelf-Reflection 使用 Evaluator 反馈的方式并不是直接沿用标量分数本身，而是将其放大为语言化的经验反馈。首次试验后，Self-Reflection 模型分析集合 {τ0, r0}，生成总结 sr0 并存入记忆 mem；对第 t 次试验，srt 是口头经验反馈。这一转换后的反思文本会被加入下一 episode 的额外上下文，并保存在情景记忆缓冲中，以促使后续试验中做出更好的决策。在编程任务的生成模板中，这一机制表现为生成内容包含单元测试反馈、先前的 Self-reflection，以及下一次函数实现的指令。Actor、Evaluator 和 Self-Reflection 会在试验中循环工作，直到 Evaluator 判定当前轨迹 τt 正确。",
+      "expected_concepts": [
+        "binary feedback",
+        "scalar feedback",
+        "textual feedback",
+        "self-reflection"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-reflexion-alfworld",
+      "query": "Reflexion 在 ALFWorld 中如何根据失败 trajectory 形成后续 trial 的语言提示？",
+      "answer": "在 Reflexion 的 ALFWorld 流程中，失败 trajectory 不会被原样当作提示，而是被压缩为语言性自我反思，再作为后续 trial 的额外上下文。具体机制如下：首先，环境提供二元成功/失败信号；每个 trial 后，自我反思循环被用来放大这一稀疏信号，ALFWorld 决策设置的记忆大小为 3 条经验。其次，自我反思模型（由 LLM 实例化）以稀疏奖励信号、当前 trajectory 和持久记忆 mem 为输入，生成比标量奖励更有信息量的细致语言反馈，并存储回 mem。总体框架把环境反馈转换为文本摘要，agent 把反思文本维护在 episodic memory 中，以改善后续决策；该文本会在下一 episode 作为 LLM agent 的附加上下文。再次，在 ALFWorld 中，自我反思会把长的失败轨迹蒸馏为相关经验，用作未来的“self-hints”；它尤其能识别长轨迹中的早期错误，并让 agent 建议新的动作选择或长期计划。一个常见失败模式是 agent 误以为自己持有某物品但实际没有持有，随后无法回溯定位错误；Reflexion 几乎消除了这类情况。为避免句法错误，Reflexion 提供两个领域特定的 few-shot trajectory，ReAct few-shot prompts 和 Reflexion 示例见论文附录。效果上，ReAct + Reflexion 在 ALFWorld 完成 134 个任务中的 130 个，并能通过连续 trial 学习解决额外任务，而 ReAct-only 在 trial 6 和 7 之间提升停滞。实验上，Reflexion 允许 agent 在失败任务上收集经验并重试，直到某任务连续 3 次失败；相比之下，基线方法在后续 trial 无法解决首次失败的任务。需要说明的是，证据也指出 Reflexion 对需要大量多样性和探索的任务可能无法生成有帮助的自我反思，但在 ALFWorld 中，agent 能充分探索新环境，因为允许的动作可以直接在观察中看到。",
+      "expected_concepts": [
+        "ALFWorld",
+        "failed trajectory",
+        "verbal reflection",
+        "next trial"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-reflexion-sliding-window",
+      "query": "Reflexion 的 memory 如何在上下文长度有限时保留近期反思？",
+      "answer": "Reflexion 的记忆并非单一缓冲区，而是由短期记忆和长期记忆共同构成：轨迹历史充当短期记忆，Self-Reflection 模型输出的反思被存入长期记忆。当上下文长度有限时，Reflexion 保留近期反思的具体做法是截断记忆：为避免 prompt 窗口超过最大限制，将 agent 的记忆截断至最近 3 条自我反思（经验）。同时，长期记忆被限制为一个具有最大容量的滑动窗口。反射内容的生成与存储流程为：Self-Reflection 模型以稀疏奖励信号、当前轨迹和持久记忆 mem 为输入，生成比标量奖励更有信息量的细致反馈，再将该反馈写入 mem，供后续试验使用。",
+      "expected_concepts": [
+        "memory",
+        "recent reflections",
+        "context window",
+        "episodic"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-reflexion-no-weight-update",
+      "query": "Reflexion 为什么被描述为 verbal reinforcement，而不是通过梯度更新模型权重？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "verbal reinforcement",
+        "language feedback",
+        "frozen weights",
+        "in-context"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-geosearcher-goal",
+      "query": "GeoSearcher 为什么把遥感视觉定位从 one-shot coordinate generation 改写为 anchor-guided progressive reasoning？",
+      "answer": "GeoSearcher 之所以把遥感视觉定位从 one-shot coordinate generation 改写为 anchor-guided progressive reasoning，核心原因是：一次性直接生成坐标在复杂遥感场景中较为脆弱，同时直接把多步推理范式迁移到遥感视觉定位也存在局限。现有许多基于 MLLM 的方法虽然具备跨模态理解和坐标生成能力，但仍将定位表述为直接坐标生成，这种 one-shot 预测在遥感影像中仍然困难，因此研究需要从直接生成走向多步定位过程。为了缓解上述问题，GeoSearcher 借助参考对象线索在唯一识别小目标中的自然桥接作用：对复杂查询，它把已验证的参考对象坐标用 <ref_bbox> 特殊标记包裹，并把该坐标片段作为推理链中的锚点，从而在参考对象提及与对应图像区域之间建立显式的坐标级关联。基于这一形式化，GeoSearcher 将 RSVG 从一次性坐标生成改写为 anchor-guided progressive reasoning。其推理策略是先利用粗略位置线索定位参考对象，缩小相关的局部搜索区域，再定位最终目标对象；对简单查询则联合使用可用线索，不强制进行不必要的中间推理。与直接 one-shot 定位相比，这种锚点引导的推理可以减少搜索负担，因为直接一次性定位在大型遥感场景中更容易受到视觉相似干扰物的影响。实现层面，GeoSearcher 通过 Anchor-Centric Reasoning Supervised Fine-Tuning（ACR-SFT）和 Process-Faithful Group Relative Policy Optimization（PF-GRPO）两个耦合阶段完成：ACR-SFT 通过显式参考锚点注入结构化推理先验，并利用锚点中心推理数据教会模型把关键视觉线索表示为锚点、围绕锚点逐步整合位置、关系和属性线索；PF-GRPO 则将中间推理过程与最终目标定位对齐。此外，分析表明参考对象定位不准确会移动局部搜索区域并导致最终预测偏差，因此准确的参考定位对可靠渐进推理很重要。",
+      "expected_concepts": [
+        "small targets",
+        "similar distractors",
+        "multi-clue queries",
+        "progressive reasoning"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-geosearcher-search-steps",
+      "query": "GeoSearcher 的 progressive search 从粗位置线索到最终目标依次经过哪些步骤？",
+      "answer": "根据已有证据，GeoSearcher 将 RSVG 从一次性坐标生成重构为锚点引导的渐进推理问题，并在参考对象提及与对应图像区域之间建立显式坐标级关联。其 progressive search 从粗位置线索到最终目标依次为：1）利用粗位置线索；2）对参考对象（reference object）进行 grounding；3）缩小相关局部搜索区域；4）定位最终目标对象。补充表述为：模型在锚点周围通过多线索整合逐步缩小搜索区域，然后再定位较小的目标对象。对于简单查询，GeoSearcher 会联合使用可用线索直接进行定位，而不强制插入不必要的中间推理。该流程由两阶段后训练框架支撑：Stage 1 的 ACR-SFT 同时使用带锚点的渐进推理数据和不带锚点的推理数据，使模型根据查询结构自适应选择推理模式；Stage 2 的 PF-GRPO 通过 Process-Aware Reward 联合评估关键中间推理过程和最终目标定位。",
+      "expected_concepts": [
+        "coarse location",
+        "reference object",
+        "local search region",
+        "final target"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-geosearcher-two-stages",
+      "query": "GeoSearcher 的 ACR-SFT 与 PF-GRPO 两个阶段分别承担什么作用？",
+      "answer": "在 GeoSearcher 的两阶段后训练框架中，ACR-SFT 与 PF-GRPO 分别承担不同但互补的作用。\n\n第一阶段 ACR-SFT（Anchor-Centric Reasoning Supervised Fine-Tuning）负责注入锚点中心的渐进推理先验。具体而言，它使用 anchor-centric reasoning 数据训练模型，使模型把关键视觉线索表示为锚点，并围绕锚点逐步整合位置、关系和属性线索；训练样本同时包括带显式锚点的复杂查询和不带锚点的简单查询，使模型能自适应地使用锚点：复杂查询进行锚点引导的渐进搜索，简单查询避免不必要的锚点生成。因此，ACR-SFT 的核心作用是为后续策略优化提供结构化的推理先验。\n\n第二阶段 PF-GRPO（Process-Faithful Group Relative Policy Optimization）负责在 ACR-SFT 的基础上进行过程忠实的策略优化。其 policy model 和 reference model 都从 Stage-1 ACR-SFT checkpoint 初始化；与第一阶段监督目标不同，PF-GRPO 依据一组采样推理轨迹的相对质量来更新策略，使模型不只是模仿中间推理模式，而是进一步利用锚点推理先验，对齐中间推理过程与最终目标定位，从而实现更准确、更忠实的 grounding。\n\n两者互补：ACR-SFT 注入 progressive reasoning prior，PF-GRPO 进一步优化模型以利用该先验。消融结果也支持这一分工：单独 ACR-SFT 的监督定位性能略低于标准 SFT（Pr@0.5 79.64 对 80.02），但 ACR-SFT+PF-GRPO 达到 Pr@0.5 81.52、Pr@0.7 70.12、mIoU 71.53，优于 SFT+Basic GRPO 的 80.23、69.12、70.52。这说明 ACR-SFT 虽然单独监督性能并非最高，却为后续 policy optimization 提供了更适合的起点。",
+      "expected_concepts": [
+        "ACR-SFT",
+        "PF-GRPO",
+        "anchor-centric reasoning",
+        "process alignment"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-geosearcher-anchor-data",
+      "query": "Anchor-Centric Reasoning Data 如何把 reference object mention 与正确图像区域显式关联？",
+      "answer": "Anchor-Centric Reasoning Data 是通过在推理链中直接插入参考对象的边界框坐标，来把 reference object mention 与正确图像区域显式关联的。其数据准备与验证流水线不仅生成包含中间参考对象的渐进式推理轨迹，还会验证参考锚点在语义和空间上是否有效，并以上下文对齐的方式把该参考对象坐标写入推理链。结构化轨迹的合成以遥感图像 I、语言查询 Q 和真值框 B_tgt 为条件，利用 Qwen3VL-Plus 的演绎能力生成。这样，推理文本中会出现类似 `<ref_bbox>[689, 349, 869, 410]</ref_bbox>` 的显式坐标标记，模型随后围绕这个被锚定的物体进行关系搜索（如向左搜索）。论文将这种设计概括为在 reference object mention 与其对应图像区域之间建立显式的坐标级关联，并把 RSVG 从一次性坐标生成重构为锚点引导的渐进式推理。该显式参考锚点主要针对复杂查询引入，简单查询不强制引入。以往方法通常缺乏这类显式约束，若参考锚点未被正确 grounding，错误会传播到后续推理；参考锚点定位不准确也会移动后续关系搜索区域并导致错误的最终预测，因此准确的参考 grounding 对可靠渐进推理很重要。",
+      "expected_concepts": [
+        "reference object",
+        "verified coordinates",
+        "<ref_bbox>",
+        "coordinate-level association"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-geosearcher-par",
+      "query": "GeoSearcher 的 Process-Aware Reward 由哪些目标、耦合和惩罚项构成？",
+      "answer": "根据所给证据，GeoSearcher 的 Process-Aware Reward（PAR）可辨识的构成如下：在目标/评价对象方面，PAR 联合评估参考定位（reference grounding）和最终目标定位（final target localization）；在耦合机制方面，它不是只给最终目标定位的 target-only reward，而是把关键推理步骤与目标定位联合评估，并与 Reasoning-Informative Sample Selector（RISS）互补：PAR 提供过程感知奖励信号，使过程信息样本更可能处于 RISS 优先的中等奖励区间。图示中的每个 rollout 奖励同时涉及 target ground truth、reference ground truth、predicted target 和 predicted reference。关于惩罚项（penalty term），所给证据没有明确列出其具体定义或构成，因此无法从这些材料确认惩罚项部分。",
+      "expected_concepts": [
+        "target term",
+        "coupling term",
+        "penalty term",
+        "PAR"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-geosearcher-riss",
+      "query": "RISS 如何根据预测的 PAR 选择对当前训练更有信息量的样本？",
+      "answer": "RISS 是一个与当前模型在线同步更新的价值模型，其作用是在采样阶段估计候选样本的期望 PAR 响应，从而在真正 rollout 之前筛选样本。选择流程是：在第 n 个训练步，先从训练集过采样 k×m 个样本构造候选池 C_n；RISS 价值模型对每个候选 x 输出预测的期望 PAR 值 V_φ(x)。由于原始 PAR 不一定在 [0,1] 内，选择前会先归一化。随后 RISS 按与目标阈值 τ_RISS 的接近程度挑选 m 个样本，即 B_n = argmin_{S⊂C_n, |S|=m} ∑_{x∈S} |V_φ(x) - τ_RISS|，τ_RISS 设为 0.4。这一策略的核心是优先选择预测 PAR 处于中等水平的样本：这类样本对提升渐进推理质量更有信息量，既避免把预算花在模型已经基本掌握、继续优化增量有限的样本上，也避免在当前阶段集中于处于低 PAR 饱和区的过难样本。选中样本之后，模型只对这些样本生成 G 条 rollout 轨迹，并基于这些轨迹上的 PAR 执行 PF-GRPO 更新。RISS 价值模型通过最小化其预测值与采样轨迹上观测到的平均 PAR 之间的均方误差在线更新，因此能够跟踪模型能力变化。RISS 不会永久丢弃困难样本；随着模型变强，原先处于低 PAR 饱和区的困难样本可能进入非饱和区，在后续训练阶段被重新优先选择。与 PAR 配合时，PAR 提供过程感知的奖励信号，使过程信息丰富的样本更可能停留在 RISS 偏好的中等奖励区间，因此两者互补：PAR 提供过程感知信号，RISS 把优化集中在这些信号更有用的样本上。",
+      "expected_concepts": [
+        "expected PAR",
+        "moderate response",
+        "online value model",
+        "sample selection"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-geosearcher-simple-complex",
+      "query": "GeoSearcher 如何让简单 query 避免不必要中间推理，同时让复杂关系 query 使用 anchor？",
+      "answer": "GeoSearcher 通过两阶段后训练实现 query-adaptive grounding，而不是对所有查询强制同一条推理链。在 Stage 1 的 ACR-SFT 中，模型同时学习两类样本：复杂查询样本带有显式 anchor，简单查询样本不带 anchor；这种设计使模型能根据 query structure 自适应选择推理模式。对简单查询，GeoSearcher 联合使用已有 clues 直接定位，不强制引入不必要的中间推理；对复杂查询，则采用 anchor-guided progressive reasoning：先利用 coarse location clues，ground reference object，围绕 anchor 缩小相关局部搜索区域，再定位最终目标对象。Stage 2 的 PF-GRPO 进一步对齐这一推理过程，其 Process-Aware Reward 同时评价关键中间推理步骤和最终定位。因此，简单查询与复杂关系查询的区分主要来自 ACR-SFT 的训练数据模式，模型在推理时按查询结构自适应决定是否走 anchor 引导的渐进推理。",
+      "expected_concepts": [
+        "simple query",
+        "complex relational query",
+        "unnecessary reference",
+        "adaptive reasoning"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-geosearcher-benchmarks",
+      "query": "GeoSearcher 在哪些三个 RSVG benchmark 上进行实验，这些 benchmark 分别强调什么场景？",
+      "answer": "GeoSearcher 在 DIOR-RSVG、OPT-RSVG 和 VRS-Bench 三个 RSVG benchmark 上进行实验。根据所提供证据，这三个数据集整体覆盖基础定位（base grounding）、复杂场景理解（complex scene understanding）和细粒度推理（fine-grained reasoning）三类场景。其中，DIOR-RSVG 被明确描述为基于 DIOR 的基础 benchmark：它固定 800×800 分辨率，提供相对标准化的设置以评估基础 grounding 性能，查询同时包含物体属性和空间表达。OPT-RSVG 被描述为场景更大、描述更复杂；GeoSearcher 在 OPT-RSVG 上的 Pr@0.5 提升达到 27.9%，证据指出这体现出其在更大视觉搜索空间下需要整合多条线索来逐步降低歧义。VRS-Bench 在证据中作为第三个 benchmark 被列出，但所提供的材料并未给出其具体强调场景的描述。",
+      "expected_concepts": [
+        "DIOR-RSVG",
+        "OPT-RSVG",
+        "VRS-Bench",
+        "fine-grained reasoning"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-geovis-goal",
+      "query": "GeoViS 为什么将遥感视觉定位建模为 progressive visual search，而不是直接预测坐标？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "tiny targets",
+        "kilometer-scale scenes",
+        "geospatial relations",
+        "progressive search"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-geovis-two-stages",
+      "query": "GeoViS 的 visual search 和 conditional visual grounding 两阶段如何衔接？",
+      "answer": "GeoViS 将遥感视觉定位重构为两个顺序阶段：visual search 与 conditional visual grounding。两阶段衔接的核心是：第一阶段搜索得到的最优子区域被作为视觉提示/条件输入第二阶段的条件定位。具体而言，第一阶段在全局影像上进行奖励引导的层次化搜索，逐步定位文本描述对象最可能所在的子区域；该搜索采用 MCTS，候选区域作为树节点，并由地理空间奖励联合评估语义对齐和空间一致性。复杂查询被解析为物体、位置和关系线索，模型据此多步细化空间假设。第二阶段不是孤立定位，而是在全局影像中进行条件定位：将第一阶段选出的子区域作为视觉线索，用于细化最终定位。两个阶段共享统一的 VisualRAG 模型，该模型在搜索中提供动作引导和奖励评估，在定位中给出最终坐标，从而把探索、验证和最终定位连接为连贯的逐步推理过程。",
+      "expected_concepts": [
+        "visual search",
+        "best subregion",
+        "visual cue",
+        "conditional grounding"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-geovis-visualrag",
+      "query": "VisualRAG 模型统一提供哪三种核心能力？",
+      "answer": "VisualRAG（Visual Reward–Action–Grounding）模型作为 GeoViS 的核心感知与推理模块，统一提供三种核心能力。第一，奖励评估：评估候选区域的语义和几何一致性，包括对象-关系三元组 (o, p, r) 的语义正确性和检测区域的空间一致性，产生统一的奖励信号，定量反映候选区域对文本描述的满足程度。第二，动作引导：评估候选子区域，并推断基于 MCTS 的视觉搜索中最优的放大动作。第三，定位推理（最终定位/条件定位）：根据全局图像和选定子区域估计目标在全局图像中的位置，实现细粒度条件定位。该模型在视觉搜索和定位两个阶段之间共享，支持从探索、验证到最终定位的完整流程。",
+      "expected_concepts": [
+        "reward evaluation",
+        "action guidance",
+        "grounding reasoning"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-geovis-mcts",
+      "query": "GeoViS 如何用 MCTS 在候选区域间平衡 exploration 与 exploitation？",
+      "answer": "GeoViS 将视觉搜索过程形式化为马尔可夫决策过程（MDP）：状态 s_t 表示全局影像中的候选区域，由空间坐标和多模态特征描述；动作 a_t 按状态转移 T 将区域变换到新状态，grounding 模型给出标量奖励 r_t=R(s_t,a_t)，反映候选区域与文本描述的语义相关性。这一公式使 GeoViS 能用 MCTS 做推理式探索，在新区域探索和有希望假设的利用之间取得平衡 [research:geovis_pdf:2059]。\n\n在 MCTS 的 selection 阶段，GeoViS 按 UCT 规则选择子节点：a* = argmax_{a∈A(s)} [Q(s,a) + c sqrt(ln N(s) / (N(s,a)+ε))]。其中 Q(s,a) 是动作在状态上的平均回报，用于 exploitation，偏向历史回报高的候选区域；N(s) 和 N(s,a) 分别是节点与边的访问次数，第二项是 exploration bonus，访问次数越少该项越大，推动访问尚未充分探索的区域；常数 c 调节探索与利用的相对强度 [research:geovis_pdf:2059]。之后 expansion 对候选区域施加动作，生成新的候选区域节点 [research:geovis_pdf:2059]。\n\n在 simulation/奖励评估阶段，奖励函数 R(s_t,a_t) 作为每个模拟节点的评估信号，衡量候选区域与文本描述的一致性；整体奖励包含问答奖励等语义一致性成分 [research:geovis_pdf:2069]。因此，MCTS 在候选区域之间既利用高奖励节点，又通过访问计数驱动的探索项尝试较少访问的区域，从而识别最 informative 的子区域 [research:geovis_pdf:2059][research:geovis_pdf:2063]。\n\n搜索收敛到最佳节点后，GeoViS 将对应子区域与全局图像联合输入 VisualRAG 模型进行最终条件定位，得到预测框 [research:geovis_pdf:2080]。其奖励信号由地理空间上下文和逐步细化的区域证据共同驱动，形成 reward-driven 的渐进式搜索和层级推理 [research:geovis_pdf:2040]。",
+      "expected_concepts": [
+        "MCTS",
+        "UCT",
+        "selection",
+        "backpropagation"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-geovis-reward",
+      "query": "GeoViS 的 geospatial reward 如何结合语义验证与几何一致性？",
+      "answer": "GeoViS 将遥感视觉定位重定义为 geospatially rewarded visual search：在树结构视觉线索引导下逐步搜索和推理，而不是单步预测目标位置。其 geospatial reward 量化每个候选区域满足视觉线索的程度，这些视觉线索来自地理空间上下文和逐步细化的区域证据；具体实现为奖励函数 R(st,at)，在 MCTS 模拟步骤中作为每个模拟节点的评估信号，衡量状态 st 所表示区域与文本描述的对齐程度。\n\n该奖励由两个分量组成。第一个分量是 Question–Answering (QA) reward，在概念层面评估候选区域与语言描述的语义一致性；具体地，VisualRAG 模型对目标对象 o、空间属性 p 和关系引用 r 等语义元素进行二值验证，QA reward 定义为正响应数量的归一化比例，取值在 [0,1]。第二个分量是 IoU-based reward，通过空间对齐的几何监督补充 QA 项，从而引入几何一致性/空间对齐信号。\n\n二者结合体现在：搜索过程中的 geospatial rewards 会联合评估语义对齐和空间一致性，鼓励模型探索文本相关性更高、地理上更合理的区域；同时，平衡比例 α 控制 QA reward 在总奖励中的占比，α=0 时仅用 r_IoU，α=1.0 时仅用 r_QA。统一由 VisualRAG 模型完成 geospatial rewards 推断、区域级动作引导和目标区域确定后的细粒度定位。",
+      "expected_concepts": [
+        "QA reward",
+        "IoU reward",
+        "semantic consistency",
+        "geometric consistency"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-geovis-actions",
+      "query": "VisualRAG 的 action guidance 如何支持下一步区域探索？",
+      "answer": "VisualRAG 的 action guidance 在 GeoViS 的 MCTS 视觉搜索中充当下一步区域探索的策略信号。GeoViS 将复杂查询结构化/解析为 object、position、relation 线索，并以候选区域为节点进行 MCTS 搜索；VisualRAG 模型在整个流程中同时提供 action guidance、reward evaluation 和最终定位支持。其中，action guidance 不直接给出目标框，而是评估候选子区域并推断下一步探索的最优动作 a_t ∈ {1,...,9}，作为 MCTS-based search 的 policy signal；与之分工的是 reward evaluation，评估当前候选区域在对象-关系三元组上的语义正确性和检测区域的空间一致性，生成统一奖励信号。动作空间模拟人类由粗到细的搜索行为，包含 zoom-in 与 zoom-out 两类互补操作。训练阶段通过 Zoom-in action 监督，以 3×3 网格分区的层级区域选择来指导模型选择下一级子区域。MCTS 在扩展新节点、模拟得到 reward、反向传播更新节点价值后，逐步收敛到高期望奖励区域，从全局到局部缩小搜索空间；action guidance 驱动的缩放动作正是这一自引导探索的关键。被选出的子区域随后作为条件 grounding 的输入，使模型聚焦相关视觉细节，并将目标位置投影回全局图像。",
+      "expected_concepts": [
+        "candidate subregions",
+        "action guidance",
+        "zoom-in action",
+        "search policy"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-geovis-no-rl-detector",
+      "query": "GeoViS 相比依赖 RL 或外部 detector 的视觉搜索方案，采用了什么数据与搜索设计？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "without RL",
+        "without external detectors",
+        "atomic operations",
+        "reward-driven evaluation"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-geovis-evaluation",
+      "query": "GeoViS 的实验覆盖多少个遥感 grounding benchmark，论文报告了怎样的总体提升范围？",
+      "answer": "GeoViS 的实验覆盖了五个遥感 grounding benchmark。论文报告，在关键定位指标上取得了 5–15% 的提升，并在所有数据集上建立了新的 State-Of-The-Art (SOTA) 性能。",
+      "expected_concepts": [
+        "five benchmarks",
+        "5–15%",
+        "localization metrics",
+        "cross-dataset generalization"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-rsground-pipeline",
+      "query": "RSGround-R1 的 CoT-SFT 与 RFT 两阶段分别如何培养空间推理能力？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "CoT-SFT",
+        "RFT",
+        "position awareness",
+        "spatial reasoning"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-rsground-cot-data",
+      "query": "RSGround-R1 如何构建并过滤用于 CoT-SFT 的位置推理数据？",
+      "answer": "RSGround-R1 通过两阶段管线中的 CoT-SFT 阶段建立位置感知。其位置推理数据构建流程为：针对 RSVG 任务，以标注的图像–句子对 (I,q,Bgt) 为输入，其中 q 为指代表达、Bgt 为对应的真实边界框，使用先进多模态大模型 Qwen2.5-VL-72B 生成 CoT 推理过程，构建聚焦于位置解释的数据集。随后，在基础模型 Qwen2.5-VL-3B 上进行 CoT-SFT，以引导模型输出明确、有意义的位置推理链。在过滤方面，RSGround-R1 为保证数据质量，过滤掉包含不完整推理链、坐标格式不一致或错误边界框的响应，最终得到 30k 个强调空间推理的合成 CoT 样本；更多细节在附录中。完成 CoT-SFT 后，微调后的基础模型用于初始化策略模型和参考模型，再进入基于 GRPO 的 RFT 阶段。",
+      "expected_concepts": [
+        "Qwen2.5-VL-72B",
+        "ground-truth bounding box",
+        "30k samples",
+        "filtering"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-rsground-iou-sparsity",
+      "query": "为什么仅使用 IoU reward 难以改进完全不重叠的预测框？",
+      "answer": "仅使用 IoU reward 难以改进完全不重叠的预测框，关键原因是 IoU 本身只度量重叠程度。根据其定义/公式，meanIoU 对每对预测框与真值框计算交集面积与并集面积之比；当预测框与真值框完全无重叠时，交集面积为零，IoU 也因而为零。在这种奖励设计下，任何零重叠预测都得到相同的零奖励，模型既无法通过奖励大小知道预测是接近还是远离真值，也无法获得朝哪个方向调整框才能提高定位质量的反馈。RSGround-R1 明确指出，IoU 只提供有限的空间信号：零重叠预测收到零奖励，不能为定位细化提供有用反馈。在遥感视觉定位场景中，目标通常只占极大图像的很小一部分，这种零重叠和奖励稀疏情况更加常见，使模型很难从完全错误的预测中改进。为克服该问题，RSGround-R1 引入基于高斯邻近核的位置奖励，按预测区域与真值区域的距离提供连续、平滑的反馈，预测越接近真值奖励越高、越远越低。需要注意的是，GIoU、DIoU 和中心距离等距离感知函数虽然在非重叠条件下能给出非零梯度，但直接作为奖励函数仍可能带来有限甚至负面的效果。",
+      "expected_concepts": [
+        "zero overlap",
+        "zero reward",
+        "sparse signal",
+        "localization refinement"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-rsground-positional-reward",
+      "query": "RSGround-R1 的 Gaussian positional reward 如何为远离目标的预测提供连续反馈？",
+      "answer": "RSGround-R1 的 Gaussian positional reward 是为解决 IoU 奖励在预测框与 ground-truth 框零重叠时奖励为零、无法给完全偏离目标的预测提供有用反馈的问题而设计的；在 RSVG 中目标只占大图的小部分，这种稀疏奖励使模型难以从完全错误的预测中改进。该奖励使用以 ground-truth 边界框中心为均值的高斯邻近核：K(x,y)=exp[-(x-cgt_x)^2/(2σ_x^2)-(y-cgt_y)^2/(2σ_y^2)]，其中 (cgt_x,cgt_y) 是 GT 框中心，σ_x=αW/2、σ_y=αH/2，W 和 H 是 GT 框宽高，α 控制核尺度。由于高斯核在空间中处处为正并随预测点到 GT 中心的距离连续指数衰减，预测越接近 GT 得分越高，越远得分越低，因此远离目标、甚至与 GT 零重叠的预测也不会像 IoU 那样直接归零，而是获得较小但非零、平滑、距离敏感的分数，从而为定位修正提供渐进反馈。在训练中，该 positional reward 与 format reward 和 IoU reward 组合为 R=R_format+R_IoU+βR_pos，其中 β 控制空间邻近性贡献；每个 rollout 计算奖励并在组内归一化后用于 GRPO 相对优势计算，从而在 RFT 后训练中鼓励模型迭代地把预测调整到更接近目标区域。",
+      "expected_concepts": [
+        "Gaussian kernel",
+        "proximity",
+        "continuous reward",
+        "ground-truth box"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-rsground-reward-combination",
+      "query": "RSGround-R1 在 GRPO 中如何组合 format、IoU 与 positional reward？",
+      "answer": "在 RSGround-R1 的 RFT（Stage 2）中，GRPO 的奖励并不是对三类奖励做复杂融合，而是在标准的 format 与 IoU 可验证奖励基础上加入 positional reward。论文给出的总体可验证信号公式为 R = R_format + R_IoU + β R_pos，即 format reward 与 IoU reward 以系数 1 直接相加，positional reward 通过 β 控制贡献；β 用于平衡局部空间细化与任务正确性。训练实现上，先对每个 rollout 计算该组合奖励，再在 group 内归一化，然后计算 GRPO 的相对 advantage。此外，同一阶段的空间一致性引导优化不属于该奖励组合，而是对 per-token GRPO loss 进行重加权得到 L_SC。该 positional reward 设计还被指出能在 R_IoU=0 时提供有意义的空间梯度。",
+      "expected_concepts": [
+        "format reward",
+        "IoU reward",
+        "positional reward",
+        "beta"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-rsground-consistency",
+      "query": "Spatial Consistency Guided Optimization 如何利用多次 rollout 的 IoU 均值和方差重加权 GRPO loss？",
+      "answer": "根据 RSGround-R1 的设计，Spatial Consistency Guided Optimization（SCGO）是在 RFT/GRPO 阶段引入的：遥感影像中的多次 rollout 常对同一 query 产生空间不一致的预测。SCGO 先对同一 query 的多次 rollout 分别计算 IoU reward，并统计这些 IoU reward 的均值 m(IoU) 与方差 Var(IoU) 来量化空间一致性。随后，SCGO 将这两个统计量组合成自适应权重 w = exp(λm(1 − m(IoU)) + λv Var(IoU))，其中 λm 和 λv 分别控制平均定位准确度和空间方差的贡献；均值以 1 − m(IoU) 的形式进入，方差以 Var(IoU) 的形式进入。这个权重直接缩放 per-token GRPO loss：LSC = w · LGRPO，从而对空间一致性不同的样本进行差异化的损失重加权。为保证训练稳定，w 会被裁剪到 [0.5, 3.0]。应用 LSC 后，reward 标准差降低，说明 rollout 行为更稳定、策略更新更平滑。",
+      "expected_concepts": [
+        "mean IoU",
+        "IoU variance",
+        "adaptive weight",
+        "per-token GRPO loss"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-rsground-datasets",
+      "query": "RSGround-R1 的 in-domain 与 out-of-domain evaluation 分别使用哪些数据集？",
+      "answer": "根据论文，RSGround-R1 的评估从 in-domain 与 out-of-domain 两个互补角度展开。In-domain evaluation 使用 DIOR-RSVG、VRSBench-VG 和 RRSIS-D 的官方测试集。Out-of-domain generalization 使用 GeoPixInstruct 中带 visual grounding 标注的 FAST-T 与 SOTA-T 数据集，这些数据与训练数据无重叠，用于评估跨域泛化。论文还特别说明，对于在 VRSBench-VG 上微调的模型，SOTA-T 会被排除，因为 SOTA-T 源自 DOTA，而 DOTA 已包含在 VRSBench-VG 中；Table 2 报告了在 FAST-T 和 SOTA-T 上的 out-of-domain 泛化结果。",
+      "expected_concepts": [
+        "DIOR-RSVG",
+        "VRSBench-VG",
+        "RRSIS-D",
+        "FAST-T",
+        "SOTA-T"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "single-rsground-training-setting",
+      "query": "RSGround-R1 的 RFT 使用多少训练数据和 epoch，base model 与 positional reward 超参数是什么？",
+      "answer": "根据提供的证据，RSGround-R1 的 RFT 阶段采用 GRPO-based RFT，训练量为 0.4 epoch，并且仅使用每个训练数据集的 40% 数据；在 DIOR-RSVG 数据集上，该默认 0.4-epoch 设置对应 1500 个训练步。相比 direct GRPO，RSGround-R1 在使用仅 0.4 epoch（40% 数据）的情况下，Acc@0.5 提升超过 5%。关于 positional reward 超参数，证据显示其配置为 β=0.1、α=2.5；同时空间一致性引导优化的参数为 λ_m=1.2、λ_v=1。对于 base model，提供的证据没有明确写出 RSGround-R1 使用的 base model 名称；只能看到图 6 中将 RSGround-R1 与 “Qwen2.5-VL-3B w/ GRPO” 作为对照展示，但该图并未直接说明 RSGround-R1 本身的 base model 就是 Qwen2.5-VL-3B。",
+      "expected_concepts": [
+        "Qwen2.5-VL-3B-Instruct",
+        "0.4 epoch",
+        "40%",
+        "beta=0.1",
+        "alpha=2.5"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-react-reflexion-agent-components",
+      "query": "比较 ReAct 的 Thought/Act/Observation 轨迹与 Reflexion 的 Actor/Evaluator/Self-Reflection 模块分工。",
+      "answer": "ReAct 的 Thought/Act/Observation 轨迹是单个任务内的交错推理-行动-观察流。LLM 以交错方式生成言语推理轨迹（Thought）和任务相关行动（Act），Thought 用于动态创建、维持和调整高层计划，即“reason to act”；行动与外部环境交互后，其对应 Observation 被整合回连贯输入流，使外部信息进入后续推理，即“act to reason”。Thought 在轨迹中稀疏出现，语言模型自行决定 Thought 与 Act 的异步发生时机。ReAct 轨迹中的幻觉性 Thought 可能导致失败，但人工编辑特定 Thought 即可修正轨迹，这是 Act 和以往 RL 方法难以做到的。\n\nReflexion 则是跨 trial 的模块化框架，显式区分 Actor、Evaluator、Self-Reflection 三个模型：Actor 生成文本和行动；Evaluator 对 Actor 输出评分；Self-Reflection 分析上一 trial 的轨迹与反馈，生成言语经验反馈并存入记忆，供后续 Actor 改进。三者通过多个 trial 循环工作，直到 Evaluator 判定轨迹正确；记忆组件对有效性至关重要。Reflexion 的反馈机制更灵活，可接收标量值或自由文本、外部或内部模拟的反馈信号，并维护反思文本在 episodic memory buffer 中。\n\n在结构和反馈机制上，ReAct 是单一轨迹内的交错循环，环境 Observation 作为即时反馈直接进入推理流；Reflexion 是外层多 trial 的模块循环，增加 Evaluator 评分和 Self-Reflection 言语记忆，将整条 trial 的反馈提炼为持久经验。在 AlfWorld 上，ReAct + Reflexion 显著优于 ReAct，完成 134 个任务中的 130 个，并利用简单启发式检测幻觉和低效规划；ReAct-only 的性能提升在第 6 到 7 次 trial 间停滞。但在 WebShop 上，ReAct + Reflexion 未显著优于 ReAct，说明 Reflexion 的增益并非在所有环境一致。",
+      "expected_concepts": [
+        "Thought-Act-Observation",
+        "Actor",
+        "Evaluator",
+        "Self-Reflection"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-react-reflexion-learning-signal",
+      "query": "比较 ReAct 的环境 observation 与 Reflexion 的标量/语言反馈如何进入后续决策。",
+      "answer": "对 ReAct 而言，环境 observation 是在同一任务轨迹内被纳入后续推理与决策的。ReAct 提示语言模型以交错方式生成推理轨迹和动作，并通过与外部环境（如 Wikipedia）交互，把额外信息引入推理（act to reason）。模型动作及其对应 observation 被整合进一个连贯的输入流；observation 作为环境返回的信息直接进入该输入流，供模型在后续推理和决策中利用，因此其更新路径是轨迹内的即时输入流更新。 对 Reflexion 而言，其核心是语言反馈而非更新权重。代理对任务反馈信号进行口头反思，并将反思文本维护在 episodic memory buffer 中，以改进后续 trials。具体到标量/二元反馈，Reflexion 将环境返回的二元或标量反馈转换为文本总结形式的 verbal feedback，并在下一 episode 作为 LLM agent 的额外上下文加入。该框架可纳入标量值和自由形式语言等多种类型、以及外部或内部模拟等多种来源的反馈信号；生成有效反思文本需要识别模型错误位置（credit assignment）并形成可操作改进总结。给定证据对自由形式语言反馈的单独生成流程未进一步说明，证据更明确的是标量/二元反馈先被转换为语言文本总结。 两者的主要异同如下。相同之处在于，二者都把外部信号以文本形式融入语言模型上下文，以影响后续决策；Reflexion 明确不通过权重更新实现强化。关键差异在于更新路径与信息形式：ReAct 的 observation 在同一轨迹内作为 action–observation 输入流即时更新，直接进入当前推理；Reflexion 的反馈先经反思形成文本，存入 episodic memory buffer，再在下一 episode 作为额外上下文进入模型。信息形式上，ReAct 输入的是环境 observation 本身；Reflexion 输入的是由二元/标量反馈转换而来的 verbal summary 或语言反馈，而不是直接使用数值反馈。",
+      "expected_concepts": [
+        "environment observation",
+        "binary or scalar feedback",
+        "textual reflection",
+        "next decision"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-react-reflexion-weight-update",
+      "query": "比较 ReAct 的交错推理—行动轨迹与 Reflexion 的 verbal reflection/episodic memory：论文分别如何描述这些机制对后续行为的影响？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "reasoning-action trajectory",
+        "environment observation",
+        "verbal reflection",
+        "episodic memory"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-attention-react-sequence",
+      "query": "从信息流角度比较 self-attention 的序列内聚合与 ReAct 的外部环境交互。",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "query-key compatibility",
+        "weighted values",
+        "external action",
+        "observation"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-attention-react-path",
+      "query": "比较 Transformer 缩短序列依赖路径与 ReAct 通过多步轨迹连接推理和行动的机制。",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "path length",
+        "self-attention",
+        "interleaved trajectory",
+        "reason-to-act"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-geosearcher-geovis-search",
+      "query": "比较 GeoSearcher 的 anchor-guided local narrowing 与 GeoViS 的 MCTS tree search。",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "reference anchor",
+        "local search region",
+        "MCTS",
+        "tree-structured exploration"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-geosearcher-geovis-reward",
+      "query": "比较 GeoSearcher 的 PAR 与 GeoViS 的 QA+IoU geospatial reward 分别监督哪些过程。",
+      "answer": "GeoSearcher 的 PAR（Process-Aware Reward）是第二阶段 PF-GRPO 中用于对齐推理过程的奖励：它联合评估关键中间推理步骤与最终目标定位，而不是只优化目标边界框；训练中与 RISS 配合，根据归一化 PAR 响应筛选对渐进式推理更有利的 rollout 样本。因此 PAR 主要监督 GeoSearcher 第 2 阶段的推理过程对齐、关键中间步骤评估、最终目标定位以及样本选择。GeoViS 的 QA+IoU geospatial reward 是驱动渐进式视觉搜索的联合奖励。其 QA 项由 VisualRAG 对地理空间上下文中的目标对象、空间属性和关系指代进行二元预测，并以正响应比例 r_QA∈[0,1] 作为语义验证奖励；IoU 项补充几何监督，约束空间对齐。二者通过平衡系数 α 结合，最佳 α=0.1，用于引导候选区域搜索、区域级动作选择、层次化推理和最终 grounding，并体现在 Zoom-in、QA/IoU reward 获取等原子操作中。二者共同点是都强调过程与最终定位的联合监督，避免一步式只预测 bbox。差异在于：GeoSearcher 的 PAR 更偏向中间推理步骤的忠实性评估和联合定位，并通过 RISS 做样本筛选；GeoViS 则显式拆分为 QA 语义验证和 IoU 空间对齐两项，经 α 平衡后嵌入 VisualRAG 的奖励评估与区域级动作/视觉搜索过程。",
+      "expected_concepts": [
+        "Process-Aware Reward",
+        "coupling term",
+        "QA reward",
+        "IoU reward"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-geosearcher-geovis-core-module",
+      "query": "比较 GeoSearcher 的 ACR-SFT/PF-GRPO 与 GeoViS 的统一 VisualRAG 模块在 pipeline 中的作用。",
+      "answer": "（1）在 GeoSearcher 的 pipeline 中，ACR-SFT 与 PF-GRPO 是两个耦合的后训练阶段。ACR-SFT 通过 anchor-centric reasoning 数据教会模型将关键视觉线索表示为 anchor，并围绕 anchor 逐步整合位置、关系与属性线索；对简单查询则学会避免不必要的 anchor 生成，对复杂查询围绕 anchor 通过 multi-clue integration 逐步缩小搜索区域后再定位小目标。PF-GRPO 在 ACR-SFT 之后进行，policy 与 reference 模型均从 Stage-1 ACR-SFT checkpoint 初始化，并按一组采样推理轨迹的相对质量更新策略，区别于 Stage-1 的监督目标。二者互补：ACR-SFT 注入渐进式推理先验，PF-GRPO 进一步优化模型以利用该先验实现更准确、更忠实的 grounding。消融表明，单独 ACR-SFT 的监督性能略低于标准 SFT，但 ACR-SFT+PF-GRPO 优于标准 SFT+Basic GRPO，说明 ACR-SFT 的价值主要在于为后续策略优化提供更合适的起点。\n\n（2）在 GeoViS 的 pipeline 中，统一 VisualRAG 模块是核心感知与推理组件。GeoViS 将复杂查询结构化为 object、position、relation cues，先进行 MCTS-based visual search 以识别最有信息量的子区域，再进行基于全局图像与所选子区域的 conditional grounding。VisualRAG 以统一方式支持这两个阶段：它推断 geospatial rewards、指导 region-level search actions、实现细粒度 conditional grounding，并为整个流程提供 action guidance、reward evaluation 和 final localization。\n\n（3）异同比较：相同点在于二者都是各自 RSVG pipeline 的核心使能组件，并且都体现两阶段设计。差异在于，GeoSearcher 的 ACR-SFT/PF-GRPO 是训练/后训练与策略优化环节，负责让模型习得并优化 anchor-guided progressive reasoning；GeoViS 的 VisualRAG 是统一执行侧模块，负责在分层搜索与条件定位流程中完成动作引导、奖励评估和最终定位。简言之，前者侧重训练时如何塑造模型，后者侧重推理时如何统一执行搜索与定位。",
+      "expected_concepts": [
+        "ACR-SFT",
+        "PF-GRPO",
+        "VisualRAG",
+        "action guidance"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-geosearcher-geovis-query-complexity",
+      "query": "两种方法如何处理含 reference object、空间关系和属性线索的复杂 query？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "reference object",
+        "multi-clue integration",
+        "geospatial context",
+        "structured semantics"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-geosearcher-geovis-local-evidence",
+      "query": "GeoSearcher 与 GeoViS 分别如何获得能提高小目标有效分辨率的局部视觉证据？",
+      "answer": "从所提供证据看，GeoSearcher 获取局部视觉证据的核心是锚点引导的渐进推理：它先利用粗粒度位置线索并定位参考对象，再据此缩小相关局部搜索区域，最后在缩小后的局部区域内定位最终目标；对简单查询，它直接联合可用线索进行定位，而不强制执行不必要的中间推理。该策略的效果体现为：在大视觉搜索空间中能整合多条线索以逐步降低歧义；在极小目标案例中仍能正确落到目标车辆上；在 VRS-Bench 上的优势也来自搜索空间缩减和对复杂语义线索的整合。GeoViS 获取局部视觉证据的机制则不同：它将遥感视觉定位重构为渐进式搜索—推理过程，通过树结构视觉线索序列主动探索全局影像，融合多模态感知、空间推理和奖励引导探索，迭代细化地理空间假设。它用地理空间奖励量化每个候选区域满足视觉线索的程度，并据此把搜索导向有希望的位置；其视觉线索由两部分构成，即正确解释文本中的地理空间上下文，以及把可能包含目标的候选区域作为额外视觉输入以提升有效分辨率。GeoViS 的 Visual-RAG 模型评估地理空间奖励、通过多模态反馈引导区域级动作，并在识别到目标区域后执行精确的定位。实验证据显示，同时使用全局影像和目标周围裁剪的局部区域比只使用全场景影像精度更高，说明局部化视觉线索确实能增强小目标感知分辨率；其设计也使其能检测细微的小尺度目标并保持整体场景感知。关键异同：两者都采取由粗到细的渐进式搜索/推理来缩小搜索空间并聚焦局部区域。主要差异在于，GeoViS 明确地把候选区域作为额外视觉输入以提升有效分辨率，并有局部裁剪实验支撑；而 GeoSearcher 的现有证据主要说明它通过锚点/参考对象缩小局部搜索区域，并未明确说明是否把裁剪区域作为额外视觉输入。此外，GeoSearcher 对简单查询可以跳过不必要的中间推理，GeoViS 则强调将空间查询分解为子问题并进行奖励驱动的多步/树结构候选区域搜索。",
+      "expected_concepts": [
+        "anchor",
+        "local search region",
+        "candidate subregion",
+        "visual cue"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-geosearcher-geovis-training",
+      "query": "比较 GeoSearcher 的两阶段 post-training 与 GeoViS 不依赖 RL 的 visual-search 数据构建方案。",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "supervised fine-tuning",
+        "GRPO",
+        "without RL",
+        "atomic operations"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-geovis-rsground-objective",
+      "query": "比较 GeoViS 的 inference-time visual search 与 RSGround-R1 的 training-time spatial reasoning optimization。",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "MCTS search",
+        "conditional grounding",
+        "positional reward",
+        "spatial consistency"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-geovis-rsground-reward",
+      "query": "比较 GeoViS geospatial reward 与 RSGround-R1 positional reward 的输入信号和用途。",
+      "answer": "GeoViS 的 geospatial reward 是一种面向遥感视觉定位搜索过程的区域级评估信号。它在 MCTS 模拟节点上评估候选区域状态与文本描述/视觉线索的匹配程度，量化每个区域满足由地理空间上下文和逐步细化的区域证据所形成视觉线索的程度，从而将搜索导向更有希望的位置。具体计算上，该奖励函数 R(st, at) 由两部分组成：一是 Question-Answering reward，由 VisualRAG 模型对文本描述中的目标对象 o、空间属性 p、关系参照 r 进行二值验证，并将正响应比例归一化为 r_QA∈[0,1]；二是 IoU-based reward，为空间对齐提供几何监督。其用途是通过奖励驱动搜索过程，引导区域级动作，并在识别目标区域后执行精细定位。 RSGround-R1 的 positional reward 是一种用于强化学习后训练阶段的连续、距离敏感的奖励信号。其输入信号是预测框与 ground-truth 区域之间的空间关系：当预测框与真值区域重叠或位于真值区域附近时获得更高分数，并通过 Gaussian kernel 提供空间引导。在用途上，它作为 GRPO 中可验证奖励的一部分，与 format reward 和 IoU reward 组成总奖励 R = R_format + R_IoU + βR_pos，在组内归一化后计算相对优势；即使 RIoU=0，仍能提供有意义的空间梯度，使预测框在训练中逐步向目标区域靠近。 两者的相同点在于都引入了空间/几何信号来增强遥感定位的精度，并且都包含 IoU 相关的几何监督。主要差异在于：GeoViS 的 geospatial reward 更偏重于推理阶段对候选区域进行语义与几何的联合评估，其输入包括候选区域状态、由地理空间上下文和区域证据形成的视觉线索，以及从文本描述解析出的对象、空间属性和关系参照，用途是指导搜索动作和节点选择；RSGround-R1 的 positional reward 则更偏重于强化学习后训练阶段对预测框位置进行连续的距离/邻近性反馈，其输入直接是预测框与真值区域的空间位置关系，用途是优化策略模型，使预测框逐步向目标区域移动。",
+      "expected_concepts": [
+        "QA reward",
+        "IoU reward",
+        "Gaussian proximity",
+        "GRPO"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-geovis-rsground-small-target",
+      "query": "比较 GeoViS 与 RSGround-R1 针对遥感视觉定位难点采用的机制：GeoViS 的局部区域搜索与 RSGround-R1 的空间奖励分别如何工作？",
+      "answer": "GeoViS 的局部区域搜索机制：GeoViS 将遥感视觉定位重新表述为一种地理空间奖励驱动的主动视觉搜索，采用“分层搜索 + 条件定位”的两阶段过程。它不是一步直接预测目标位置，而是在全局图像上通过树结构的视觉线索序列主动探索；同时把空间查询分解为可解释子问题，利用地理空间奖励量化每个候选区域满足视觉线索的程度，这些视觉线索由文本中的地理空间上下文和逐步细化的区域证据共同得出。搜索由统一的 VisualRAG 模型执行：该模型推断地理空间奖励、通过多模态反馈指导区域级搜索动作，并在目标区域确定后进行条件定位；候选区域还被作为额外视觉输入来提高有效分辨率。 RSGround-R1 的空间奖励机制：RSGround-R1 是推理引导、位置感知的后训练框架。其位置奖励被设计为 IoU 的稠密松弛，是连续且对距离敏感的；即使在预测与真值零重叠时也能提供有信息量的梯度信号，并在 RFT 后训练中鼓励模型迭代调整预测、逐步靠近目标区域。同时，空间一致性引导的优化方案根据空间一致性线索调节学习动态，提高策略更新中的稳定性和可靠性。 针对的困难与设计差异：两者都面对遥感影像的大空间尺度、复杂语义和高类间相似性，文本描述高度依赖位置或关系短语。GeoViS 主要解决大型杂乱遥感场景中可靠视觉线索难以自动发现的问题，其设计重心在搜索与推理阶段：以地理空间奖励驱动树结构候选区域搜索，奖励衡量候选区域对视觉线索的满足程度，最终通过条件定位输出。RSGround-R1 主要解决低线索环境下高层推理与细粒度空间精度之间的差距，其设计重心在后训练优化：以稠密、距离敏感的 IoU 松弛位置奖励提供平滑梯度，并通过空间一致性优化稳定学习。简言之，GeoViS 的奖励用于“向哪个区域搜索”，RSGround-R1 的奖励用于“如何更近地细化预测框”。",
+      "expected_concepts": [
+        "candidate subregion",
+        "visual cue",
+        "positional reward",
+        "zero-overlap feedback"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-geovis-rsground-generalization",
+      "query": "比较 GeoViS 与 RSGround-R1 用于验证跨数据集或域外泛化的实验设计。",
+      "answer": "根据所给证据，GeoViS 与 RSGround-R1 都明确把跨数据集/域外泛化作为验证重点，但两者在数据集、划分方式、评估指标和对比基线方面存在差异。\n\nGeoViS 的泛化验证：GeoViS 在五个遥感定位基准上开展实验，证据明确给出的跨数据集泛化协议是在 DIOR-RSVG 上训练，并在 VRSBench 和 OPT-RSVG 上评估；同时报告在 DIOR-RSVG 上达到 79.8% Pr@0.5，并强调相对通用 MLLM 和遥感专用 MLLM 在关键定位指标上有 5–15% 的提升。其对比方法包括通用 MLLM、遥感专用 MLLM 以及微调基线；消融/替换实验以零样本 Qwen2.5-VL-3B 为起点，逐步替换为训练模块。\n\nRSGround-R1 的泛化验证：RSGround-R1 从两个互补视角验证，即域内评估和域外泛化。域内评估使用 DIOR-RSVG、VRSBench-VG 和 RRSIS-D 的官方测试划分；域外泛化使用来自 GeoPixInstruct 的 FAST-T 和 SOTA-T 视觉定位标注数据，并强调与训练数据无重叠；对于在 VRSBench-VG 上微调的模型，SOTA-T 被排除，因为 SOTA-T 源自 DOTA，而 DOTA 已包含在 VRSBench-VG 中。指标采用 Acc@0.5 和 Acc@0.7，并以预测框与真值框 IoU 超过阈值判为正确。对比方法包括微调后的遥感专用模型、基于 GRPO 的 RFT 以及直接 GRPO；证据还显示 RSGround-R1 仅用 0.4 epoch（40% 数据）就在 Acc@0.5 上超过直接 GRPO 5% 以上，且 FAST-T 与 SOTA-T 引入了显著的区域和传感器偏移。\n\n主要异同：相似之处在于两者都设计了独立于训练数据的跨数据集/域外评估，并将对微调或专用基线的泛化优势作为关键证据。主要差异在于：GeoViS 的跨数据集协议是 DIOR-RSVG 训练后评估 VRSBench 和 OPT-RSVG；RSGround-R1 则明确区分域内官方测试划分与域外 FAST-T/SOTA-T，并设置了针对数据重叠的排除规则。指标体系也不同：GeoViS 证据明确提到 Pr@0.5，而 RSGround-R1 采用 Acc@0.5 与 Acc@0.7。域外数据集选择不同：GeoViS 使用 VRSBench 和 OPT-RSVG，RSGround-R1 使用 FAST-T 和 SOTA-T。最后，两者对比基线不同，GeoViS 对照通用 MLLM、遥感专用 MLLM 和微调基线，RSGround-R1 对照遥感专用微调模型、GRPO-RFT 和直接 GRPO。需要注意的是，证据未完整列出 GeoViS 五个基准的名称和官方训练/测试划分，因此在该层面的更细对比受限于所给材料。",
+      "expected_concepts": [
+        "five benchmarks",
+        "cross-dataset generalization",
+        "FAST-T",
+        "SOTA-T"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-geovis-rsground-model-role",
+      "query": "比较 VisualRAG 的三项推理能力与 RSGround-R1 两阶段训练目标。",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "reward-action-grounding",
+        "CoT-SFT",
+        "RFT",
+        "spatial reasoning"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-geosearcher-rsground-process",
+      "query": "比较 GeoSearcher 的显式 anchor reasoning 与 RSGround-R1 的 position-aware CoT。",
+      "answer": "GeoSearcher 的...。RSGround-R1 的...。比较...",
+      "expected_concepts": [
+        "<ref_bbox>",
+        "anchor-centric reasoning",
+        "position-aware CoT",
+        "bounding box"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-geosearcher-rsground-grpo",
+      "query": "比较 GeoSearcher PF-GRPO 与 RSGround-R1 RFT 对标准 GRPO reward 的扩展。",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "PAR",
+        "RISS",
+        "positional reward",
+        "spatial consistency"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-geosearcher-rsground-sparse-reward",
+      "query": "两篇论文如何缓解只根据最终 IoU/坐标产生的稀疏监督？",
+      "answer": "两篇论文都针对 RSVG 中仅用最终 IoU/目标框坐标作为训练信号所带来的稀疏、结果级监督问题提出了不同的缓解路径。RSGround-R1 的机制集中在 RL 奖励层面：一是提出 positional reward，作为 IoU 的稠密松弛，使零重叠预测也能获得有信息量的梯度信号，支持渐进式定位修正；二是提出 spatial consistency guided optimization，对同一 query 的多次 rollout 计算 IoU 均值和方差，将空间一致性纳入策略更新，用 m(IoU) 表征定位质量、用 Var(IoU) 惩罚不一致 rollout，联合二者可获得最佳效果并降低 reward 标准差。GeoSeacher 的机制集中在中间过程监督层面：它认为复杂 RSVG 中仅看最终目标正确性不够，关键要看中间推理是否正确，因此把优化重点从只优化目标框转向对齐中间过程；其 Stage 1 ACR-SFT 构造 Anchor-Centric Reasoning Data，对复杂 query 使用显式 anchors、对简单 query 不使用 anchors，并在 SFT 前进行验证、人工检查和泄漏清理；Stage 2 的 GRPO 在 SFT 初始化上优化，因为直接对 base model 做 GRPO 表现较差，而两阶段策略能持续提升性能。相同之处在于，两者都拒绝只依赖最终 IoU/目标框的结果级稀疏监督，都引入了最终定位之外的额外信号来增强定位稳定性与精度。不同之处在于，RSGround-R1 是在奖励函数和 rollout 统计层面做稠密化与稳定性调制；GeoSeacher 是在训练数据和训练阶段层面注入过程监督，通过锚点中心推理轨迹和 SFT→GRPO 两阶段设计来缓解稀疏监督。",
+      "expected_concepts": [
+        "process supervision",
+        "coupling reward",
+        "zero-overlap",
+        "continuous positional feedback"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-geosearcher-rsground-data",
+      "query": "比较 GeoSearcher Anchor-Centric Reasoning Data 与 RSGround-R1 CoT 数据的构建和过滤目标。",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "verified anchor",
+        "leakage removal",
+        "synthetic CoT",
+        "wrong-box filtering"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "compare-geosearcher-rsground-stability",
+      "query": "比较 RISS 的信息量采样与 spatial-consistency weighting 如何提高训练效率或稳定性。",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "moderate PAR",
+        "sample selection",
+        "IoU variance",
+        "adaptive weighting"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "session-attention-mask",
+      "query": "那它为什么必须遮住后面的位置？",
+      "answer": "Transformer decoder 的 masked self-attention 必须遮住后面的位置，核心原因是为了保持自回归属性。具体来说，decoder 在生成输出时需要一个位置一个位置地产生结果，位置 i 的预测只能依赖已经生成的、位置小于 i 的已知输出。证据表明，必须阻止 decoder 中的信息从未来位置流向当前位置，以保持 auto-regressive property；如果不遮住后续位置，每个位置就可能关注到未来输出，使预测不再只依赖已知输出，从而破坏自回归生成。实现上，论文在 scaled dot-product attention 的 softmax 输入中，把所有对应非法连接的值设为 −∞，从而屏蔽这些未来连接。同时，这一 masking 与输出嵌入偏移一个位置共同作用，确保对位置 i 的预测只依赖位置小于 i 的已知输出。因此，decoder 的 self-attention 层只允许每个位置关注 decoder 序列中截至该位置（含该位置）的位置，而不能看到未来位置。",
+      "expected_concepts": [
+        "masking",
+        "future positions",
+        "autoregressive"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "session-react-search",
+      "query": "这个方法查到外部信息后怎样影响下一步？",
+      "answer": "根据现有证据，ReAct 从 Wikipedia API 获得返回内容后，会把这些返回结果作为观察（observations）纳入输入：它将模型动作与对应观察整合成一个连贯的输入流，供模型在下一步继续推理，而不是孤立地只看动作。这样，外部信息直接影响后续推理和动作选择：模型利用获得的信息支持推理，同时又用推理确定下一步要检索的目标，形成“行动—观察—再推理/再行动”的协同过程。证据还显示，当 ReAct 与 CoT 结合时，模型能在推理中同时使用内部知识与外部获得的信息，从而更准确地完成后续推理和动作选择。",
+      "expected_concepts": [
+        "external information",
+        "observation",
+        "updated reasoning"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "session-geosearcher-anchor",
+      "query": "前面那个 anchor 为什么能缩小搜索范围？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "reference object",
+        "local search region",
+        "final target"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "session-geosearcher-riss",
+      "query": "那它为什么偏好中等分数的样本？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "moderate PAR",
+        "informative samples",
+        "current capability"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "session-geovis-visualrag",
+      "query": "这个模块在搜索阶段具体输出什么？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "reward evaluation",
+        "action guidance",
+        "candidate region"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "session-geovis-mcts",
+      "query": "那它怎样在探索新区域和利用高分区域之间取舍？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "UCT",
+        "exploration",
+        "exploitation"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "session-rsground-positional",
+      "query": "这个 reward 在预测框完全不重叠时还有什么作用？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "Gaussian proximity",
+        "zero overlap",
+        "continuous feedback"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "session-remote-comparison",
+      "query": "继续刚才的比较：前一个用 tree search，后一个怎样稳定 rollout？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "MCTS",
+        "IoU mean",
+        "IoU variance",
+        "spatial consistency"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "cross-session-attention-order",
+      "query": "继续之前的研究：它不用 recurrence 时怎么保留顺序？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "positional encoding",
+        "sine",
+        "cosine"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "cross-session-react-observation",
+      "query": "上次那个方法获得 observation 后如何更新计划？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "observation",
+        "action plan",
+        "reasoning trace"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "cross-session-reflexion-memory-window",
+      "query": "之前说的记忆机制怎样把反思用于后续 trial？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "reflection",
+        "episodic memory",
+        "next trial"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "cross-session-geosearcher-local",
+      "query": "继续之前的研究：它的局部搜索策略呢？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "anchor",
+        "narrow search region",
+        "target localization"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "cross-session-geovis-reward",
+      "query": "上次那个方法用什么信号给候选区域打分？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "QA reward",
+        "IoU reward",
+        "geospatial reward"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "cross-session-rsground-reward",
+      "query": "继续之前的分析：它如何给完全不重叠的框提供学习信号？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "positional reward",
+        "Gaussian kernel",
+        "zero overlap"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "cross-session-geosearcher-geovis",
+      "query": "继续比较之前两种方法：一个怎样用 anchor，另一个怎样用 tree search？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "anchor-guided",
+        "local region",
+        "MCTS",
+        "tree search"
+      ],
+      "correctness": null,
+      "notes": ""
+    },
+    {
+      "id": "cross-session-geovis-rsground",
+      "query": "继续上次的研究：前者的局部证据和后者的连续空间反馈有何区别？",
+      "answer": "无法基于当前证据可靠生成回答",
+      "expected_concepts": [
+        "candidate subregion",
+        "visual cue",
+        "continuous positional reward",
+        "localization"
+      ],
+      "correctness": null,
+      "notes": ""
+    }
+  ]
+}
