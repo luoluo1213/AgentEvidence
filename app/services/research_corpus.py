@@ -107,60 +107,144 @@ class ResearchCorpusLoader:
             results.append((metadata, count))
         return results
 
-
 def section_aware_chunks(document: str, size: int) -> list[str]:
-    """Split Markdown within heading boundaries, preserving source text and section labels."""
+    """Split Markdown within heading boundaries with a strict size bound."""
+
     sections: list[tuple[str, list[str]]] = []
     heading = "Document"
     body: list[str] = []
+
     for line in document.splitlines():
         match = re.match(r"^(#{1,6})\s+(.+?)\s*$", line)
+
         if match:
             if body:
                 sections.append((heading, body))
+
             heading = match.group(2).strip()
             body = []
         else:
             body.append(line)
+
     if body:
         sections.append((heading, body))
 
     chunks: list[str] = []
+
     for section, lines in sections:
         text = "\n".join(lines).strip()
+
         if not text:
             continue
-        paragraphs = [item.strip() for item in re.split(r"\n\s*\n", text) if item.strip()]
+
+        prefix = f"## {section}\n\n"
+        body_limit = max(1, size - len(prefix))
+
+        paragraphs = [
+            item.strip()
+            for item in re.split(r"\n\s*\n", text)
+            if item.strip()
+        ]
+
         units: list[str] = []
+
         for paragraph in paragraphs:
-            if len(paragraph) <= size:
+
+            if len(paragraph) <= body_limit:
                 units.append(paragraph)
                 continue
-            sentences = re.split(r"(?<=[.!?。！？])\s+", paragraph)
+
+            sentences = re.split(
+                r"(?<=[.!?。！？])\s+",
+                paragraph,
+            )
+
             current = ""
+
             for sentence in sentences:
-                if current and len(current) + 1 + len(sentence) > size:
+                sentence = sentence.strip()
+
+                if not sentence:
+                    continue
+
+                # 单个 sentence 本身已经超长
+                if len(sentence) > body_limit:
+
+                    if current:
+                        units.append(current)
+                        current = ""
+
+                    units.extend(
+                        _split_oversized_text(
+                            sentence,
+                            body_limit,
+                        )
+                    )
+
+                    continue
+
+                candidate = (
+                    f"{current} {sentence}".strip()
+                    if current
+                    else sentence
+                )
+
+                if current and len(candidate) > body_limit:
                     units.append(current)
                     current = sentence
                 else:
-                    current = f"{current} {sentence}".strip()
+                    current = candidate
+
             if current:
                 units.append(current)
 
-        prefix = f"## {section}\n\n"
         current = ""
+
         for unit in units:
-            candidate = f"{current}\n\n{unit}".strip() if current else unit
-            if current and len(prefix) + len(candidate) > size:
+            candidate = (
+                f"{current}\n\n{unit}".strip()
+                if current
+                else unit
+            )
+
+            if current and len(candidate) > body_limit:
                 chunks.append(prefix + current)
                 current = unit
             else:
                 current = candidate
+
         if current:
             chunks.append(prefix + current)
+
     return chunks
 
 
 def markdown_chunk_section(content: str) -> str | None:
     first = content.splitlines()[0].strip() if content else ""
     return first.lstrip("#").strip() if first.startswith("#") else None
+
+def _split_oversized_text(text: str, limit: int) -> list[str]:
+    """Split pathological long text while preferring whitespace boundaries."""
+    text = text.strip()
+    if not text:
+        return []
+
+    pieces = []
+
+    while len(text) > limit:
+        split_at = text.rfind(" ", 0, limit)
+
+        # 如果根本没有正常空格，例如 PDF 乱码，则直接硬切
+        if split_at < limit // 2:
+            split_at = limit
+
+        piece = text[:split_at].strip()
+        if piece:
+            pieces.append(piece)
+
+        text = text[split_at:].strip()
+
+    if text:
+        pieces.append(text)
+
+    return pieces

@@ -8,11 +8,10 @@ from pydantic import BaseModel, Field
 
 class ResearchTaskType(str, Enum):
     FACT_LOOKUP = "FACT_LOOKUP"
-    CROSS_DOCUMENT_COMPARISON = "CROSS_DOCUMENT_COMPARISON"
+    COMPARISON = "COMPARISON"
     MULTI_HOP_RESEARCH = "MULTI_HOP_RESEARCH"
     PAPER_REPO_ANALYSIS = "PAPER_REPO_ANALYSIS"
     GENERAL_RESEARCH = "GENERAL_RESEARCH"
-
 
 class ResearchSourceType(str, Enum):
     PAPER = "paper"

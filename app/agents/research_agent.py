@@ -3,8 +3,8 @@ from __future__ import annotations
 import hashlib
 import logging
 from typing import Protocol
-
-from app.agents.research_types import EvidenceItem, EvidencePool, ResearchSourceType, ResearchTask, ResearchTaskType
+from app.agents.evidence_selector import EvidenceSelector
+from app.agents.research_types import EvidenceItem, EvidencePool, ResearchSourceType, ResearchTask, ResearchTaskType,EvidenceVerificationResult
 
 
 logger = logging.getLogger(__name__)
@@ -37,6 +37,7 @@ class ResearchAgent:
         top_k: int = 8,
         max_evidence_items: int = 12,
         corpus: str | None = "research",
+        evidence_selector: EvidenceSelector | None = None,
     ):
         if top_k < 1:
             raise ValueError("top_k must be at least 1")
@@ -46,21 +47,28 @@ class ResearchAgent:
         self.top_k = top_k
         self.max_evidence_items = max_evidence_items
         self.corpus = corpus
+        self.evidence_selector = evidence_selector or EvidenceSelector()
 
-    def research(self, task: ResearchTask, retrieval_round: int = 1) -> EvidencePool:
+    def research(self, task: ResearchTask, retrieval_round: int = 1,queries: list[str] | None = None) -> EvidencePool:
         if retrieval_round < 1:
             raise ValueError("retrieval_round must be at least 1")
 
-        queries = self._queries_for(task)
+        # queries = self._queries_for(task)
+        retrieval_queries = (
+            self._normalize_queries(queries)
+            if queries is not None
+            else self._queries_for(task)
+        )
+
         logger.info(
             "research started; task_id=%s task_type=%s number_of_queries=%d",
             task.task_id,
             task.task_type.value,
-            len(queries),
+            len(retrieval_queries),
         )
 
         result_groups: list[tuple[str, list[KnowledgeResult]]] = []
-        for query_index, query in enumerate(queries, start=1):
+        for query_index, query in enumerate(retrieval_queries, start=1):
             try:
                 results = self.knowledge_service.retrieve(query, self.top_k, corpus=self.corpus)
             except Exception as exc:
@@ -79,13 +87,31 @@ class ResearchAgent:
                 len(results),
             )
 
+        # pool = self._prefer_expected_sources(
+        #     task,
+        #     self._round_robin_merge(result_groups, retrieval_round, limit=self.max_evidence_items * 2),
+        # )
+        # pool = self._prefer_entity_sources(task, pool)
+        # if len(pool) > self.max_evidence_items:
+        #     pool = EvidencePool(items=list(pool.items)[: self.max_evidence_items])
+        
         pool = self._prefer_expected_sources(
             task,
-            self._round_robin_merge(result_groups, retrieval_round, limit=self.max_evidence_items * 2),
+            self._round_robin_merge(
+                result_groups,
+                retrieval_round,
+                limit=self.max_evidence_items * 3,
+            ),
         )
+
         pool = self._prefer_entity_sources(task, pool)
-        if len(pool) > self.max_evidence_items:
-            pool = EvidencePool(items=list(pool.items)[: self.max_evidence_items])
+
+        pool = self.evidence_selector.select(
+            task,
+            pool,
+            max_items=self.max_evidence_items,
+        )
+
         logger.info(
             "research completed; task_id=%s evidence_count=%d unique_source_count=%d",
             task.task_id,
@@ -112,6 +138,116 @@ class ResearchAgent:
         if not queries and task.query.strip():
             queries.append(_unwrap_current_question(task.query.strip()))
         return queries
+    
+    def _normalize_queries(
+        self,
+        queries: list[str],
+    ) -> list[str]:
+        normalized: list[str] = []
+        seen: set[str] = set()
+
+        for candidate in queries:
+            query = _unwrap_current_question(
+                str(candidate or "").strip()
+            )
+
+            if not query or query in seen:
+                continue
+
+            seen.add(query)
+            normalized.append(query)
+
+            if len(normalized) >= MAX_QUERIES_PER_TASK:
+                break
+
+        return normalized
+    
+    def repair(
+        self,
+        task: ResearchTask,
+        evidence_pool: EvidencePool,
+        verification: EvidenceVerificationResult,
+    ) -> EvidencePool:
+        queries = self._normalize_queries(
+            verification.suggested_queries
+        )
+
+        if not queries:
+            logger.info(
+                "retrieval repair skipped; task_id=%s reason=no_suggested_queries",
+                task.task_id,
+            )
+            return evidence_pool
+
+        logger.info(
+            "retrieval repair started; task_id=%s query_count=%d",
+            task.task_id,
+            len(queries),
+        )
+
+        repaired_pool = self.research(
+            task,
+            retrieval_round=2,
+            queries=queries,
+        )
+
+        merged_pool = EvidencePool(
+            items=list(evidence_pool.items)
+        )
+        merged_pool.extend(repaired_pool.items)
+
+        merged_pool = self._prefer_expected_sources(
+            task,
+            merged_pool,
+        )
+        merged_pool = self._prefer_entity_sources(
+            task,
+            merged_pool,
+        )
+
+        if len(merged_pool) > self.max_evidence_items:
+            round_two = [
+                item
+                for item in merged_pool.items
+                if item.retrieval_round == 2
+            ]
+            previous = [
+                item
+                for item in merged_pool.items
+                if item.retrieval_round != 2
+            ]
+
+            ordered_items: list[EvidenceItem] = []
+
+            max_length = max(
+                len(round_two),
+                len(previous),
+            )
+
+            for index in range(max_length):
+                if index < len(round_two):
+                    ordered_items.append(round_two[index])
+
+                if index < len(previous):
+                    ordered_items.append(previous[index])
+
+                if len(ordered_items) >= self.max_evidence_items:
+                    break
+
+            merged_pool = EvidencePool(
+                items=ordered_items[: self.max_evidence_items]
+            )
+
+        logger.info(
+            "retrieval repair completed; task_id=%s "
+            "old_evidence=%d new_evidence=%d merged_evidence=%d",
+            task.task_id,
+            len(evidence_pool),
+            len(repaired_pool),
+            len(merged_pool),
+        )
+
+        return merged_pool
 
     def _round_robin_merge(
         self,
@@ -140,19 +276,50 @@ class ResearchAgent:
         if not preferred:
             return pool
         selected = preferred if len(preferred) >= min(4, self.max_evidence_items) else preferred + others
-        return EvidencePool(items=selected[: self.max_evidence_items])
+        return EvidencePool(items=selected)
 
-    def _prefer_entity_sources(self, task: ResearchTask, pool: EvidencePool) -> EvidencePool:
-        entities = [_normalize_match_text(entity) for entity in task.entities if entity and entity.strip()]
+    def _prefer_entity_sources(
+        self,
+        task: ResearchTask,
+        pool: EvidencePool,
+    ) -> EvidencePool:
+        entities = [
+            _normalize_match_text(entity)
+            for entity in task.entities
+            if entity and entity.strip()
+        ]
+
         if not entities or not pool.items:
             return pool
+
         matching = [
-            item for item in pool.items
-            if any(_evidence_matches_entity(item, entity) for entity in entities)
+            item
+            for item in pool.items
+            if any(
+                _evidence_matches_entity(item, entity)
+                for entity in entities
+            )
         ]
-        if len(matching) < min(3, self.max_evidence_items):
+
+        # 没有任何 provenance 能匹配实体时，
+        # 保留原始检索结果，避免错误过滤。
+        if not matching:
             return pool
-        return EvidencePool(items=matching[: self.max_evidence_items])
+
+        # 比较任务需要保证多个实体都有证据。
+        if task.requires_comparison:
+            all_entities_covered = all(
+                any(
+                    _evidence_matches_entity(item, entity)
+                    for item in matching
+                )
+                for entity in entities
+            )
+
+            if not all_entities_covered:
+                return pool
+
+        return EvidencePool(items=matching)
 
 
 def _to_evidence(result: KnowledgeResult, query_used: str, retrieval_round: int) -> EvidenceItem:

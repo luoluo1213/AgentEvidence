@@ -74,7 +74,7 @@ class ChromaKnowledgeStore:
                 "db_id": int(chunk.id),
                 "source": chunk.source,
                 "source_index": int(chunk.source_index),
-                "corpus": "research" if chunk.source.startswith("research:") else "psychology",
+                "corpus": "research",
                 "section": markdown_section(chunk.content) or "",
             }
             for chunk in rows

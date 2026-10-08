@@ -1,4 +1,5 @@
 from __future__ import annotations
+import pymupdf
 
 import hashlib
 import re
@@ -174,10 +175,34 @@ class ResearchSourceIngestionService:
         path = Path(request.location).expanduser().resolve()
         if not path.is_file() or path.suffix.lower() != ".pdf":
             raise ValueError(f"local PDF does not exist: {path}")
-        reader = PdfReader(str(path))
-        raw_pages = [(page.extract_text() or "") for page in reader.pages]
+        document = pymupdf.open(str(path))
+        raw_pages = []
+
+        for page in document:
+            kept_blocks = []
+
+            for block in page.get_text("blocks"):
+                text = str(block[4] or "").strip()
+
+                if not text:
+                    continue
+
+                if _is_corrupted_pdf_block(text):
+                    continue
+
+                kept_blocks.append(text)
+
+            raw_pages.append("\n\n".join(kept_blocks))
+        # raw_pages = [page.get_text("text") or ""for page in document]
         pages = _clean_pdf_pages(raw_pages)
-        title = str((reader.metadata.title if reader.metadata else "") or path.stem).strip()
+        metadata = document.metadata or {}
+        title = str(metadata.get("title") or path.stem).strip()
+        document.close()
+
+        # reader = PdfReader(str(path))
+        # raw_pages = [(page.extract_text() or "") for page in reader.pages]
+        # pages = _clean_pdf_pages(raw_pages)
+        # title = str((reader.metadata.title if reader.metadata else "") or path.stem).strip()
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         chunks: list[str] = []
         metadata: list[dict] = []
@@ -380,6 +405,57 @@ def _deduplicate(chunks: list[str], metadata: list[dict]) -> tuple[list[str], li
         unique_metadata.append(values)
     return unique_chunks, unique_metadata, len(chunks) - len(unique_chunks)
 
+def _is_corrupted_pdf_block(text: str) -> bool:
+    """
+    Conservatively detect obviously corrupted PDF text blocks.
+
+    Detects:
+    1. Invalid C0 control characters produced by broken PDF font mappings.
+    2. Cipher-like alphanumeric tokens such as 7KLQN, 2EV, 5HPRWH.
+    """
+    if not text:
+        return False
+
+    # PDF 正常文本不应该包含大量 C0 控制字符。
+    # \n, \r, \t 属于合法排版字符，不计入。
+    control_chars = [
+        char
+        for char in text
+        if ord(char) < 32 and char not in "\n\r\t"
+    ]
+
+    if len(control_chars) >= 2:
+        return True
+
+    normalized = re.sub(r"\s+", " ", text).strip()
+
+    if len(normalized) < 20:
+        return False
+
+    tokens = re.findall(r"[A-Za-z0-9]+", normalized)
+
+    if not tokens:
+        return False
+
+    # 类似 7KLQN / 2EV / 5HPRWH 这种字母数字异常混合 token
+    mixed_tokens = [
+        token
+        for token in tokens
+        if len(token) >= 3
+        and re.search(r"[A-Za-z]", token)
+        and re.search(r"\d", token)
+    ]
+
+    mixed_char_count = sum(len(token) for token in mixed_tokens)
+    token_char_count = sum(len(token) for token in tokens)
+
+    mixed_char_ratio = (
+        mixed_char_count / token_char_count
+        if token_char_count
+        else 0.0
+    )
+
+    return mixed_char_ratio >= 0.20
 
 def _clean_pdf_pages(pages: list[str]) -> list[str]:
     split_pages = [[line.strip() for line in text.splitlines() if line.strip()] for text in pages]

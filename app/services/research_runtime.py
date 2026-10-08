@@ -221,12 +221,12 @@ class ResearchEventDrivenCoordinator(EventDrivenCoordinator):
         verification_artifact = board.latest_artifact("evidence_verification")
         if verification_artifact is None:
             return board
+        verification = _artifact_value(board, "evidence_verification", EvidenceVerificationResult)
         artifact = board.latest_artifact("final_research_result")
         if artifact is None:
             task = _artifact_value(board, "research_task", ResearchTask)
             evidence_pool = _artifact_value(board, "evidence_pool", EvidencePool)
             draft = _artifact_value(board, "research_draft", ResearchDraft)
-            verification = _artifact_value(board, "evidence_verification", EvidenceVerificationResult)
             context = _artifact_value(board, "conversation_context", ConversationContext)
             final_result = build_final_research_result(
                 context.original_query, task, evidence_pool, draft, verification
@@ -243,7 +243,11 @@ class ResearchEventDrivenCoordinator(EventDrivenCoordinator):
             board = board.add_artifact(artifact)
         if board.latest_artifact("memory_update") is None:
             return board
-        return board.accept_final(artifact.id, self.coordinator_agent.name, "research draft verified and finalized")
+        if verification.sufficient:
+            reason = "research draft verified and finalized"
+        else:
+            reason = "research completed with insufficient evidence"
+        return board.accept_final(artifact.id, self.coordinator_agent.name, reason)
 
 
 class ResearchEventDrivenRuntime:

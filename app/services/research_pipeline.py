@@ -7,6 +7,9 @@ from pydantic import BaseModel
 from app.agents.research_draft_generator import ResearchDraft
 from app.agents.research_types import EvidencePool, EvidenceVerificationResult, ResearchTask
 
+INSUFFICIENT_EVIDENCE_ANSWER = (
+    "当前证据不足，无法基于现有证据可靠生成最终回答。"
+)
 
 class TaskAnalyzer(Protocol):
     def analyze(self, query: str) -> ResearchTask:
@@ -75,10 +78,17 @@ def build_final_research_result(
     draft: ResearchDraft,
     verification: EvidenceVerificationResult,
 ) -> FinalResearchResult:
+
+    answer = (
+    draft.answer
+    if verification.sufficient
+    else INSUFFICIENT_EVIDENCE_ANSWER
+    )
+
     return FinalResearchResult(
         query=query,
         task=task,
-        answer=draft.answer,
+        answer=answer,
         evidence_pool=evidence_pool,
         draft=draft,
         verification=verification,

@@ -12,7 +12,12 @@ from app.agents.research_draft_generator import (
     ResearchDraftGenerator,
     fallback_draft,
 )
-from app.agents.research_types import EvidencePool, ResearchTask
+
+from app.agents.research_types import (
+    EvidencePool,
+    EvidenceVerificationResult,
+    ResearchTask,
+)
 from app.core.config import Settings
 from app.research_harness.draft_validator import (
     draft_snapshot,
@@ -79,7 +84,7 @@ class CaseDiagnostics:
     evidence_insufficient: bool = False
     fallback_used: bool = False
     agent_stage_failure: bool = False
-    result_status: str = "success"
+    result_status: str = "pending"
     original_draft: dict | None = None
     original_validation_reason: str | None = None
     original_validation_message: str | None = None
@@ -97,7 +102,7 @@ class CaseDiagnostics:
         self.evidence_insufficient = False
         self.fallback_used = False
         self.agent_stage_failure = False
-        self.result_status = "success"
+        self.result_status = "pending"
         self.original_draft = None
         self.original_validation_reason = None
         self.original_validation_message = None
@@ -306,8 +311,8 @@ class HarnessDraftGenerator:
         if validation.valid:
             if is_evidence_refusal(draft):
                 self.harness.note_evidence_insufficient(message="draft refused due to insufficient evidence")
-            else:
-                diag.result_status = "success"
+            # Do not mark success here.
+            # Final success is decided by EvidenceVerifier.
             return draft
         return self._repair_or_fallback(
             task,
@@ -427,6 +432,46 @@ class HarnessDraftGenerator:
             diag.repair_validation_message = str(error)
         return fallback_draft()
 
+class HarnessEvidenceVerifier:
+    """
+    Verification-aware wrapper.
+
+    Draft validity only means that the draft structure and citations are valid.
+    Final success is decided here according to evidence sufficiency.
+    """
+
+    def __init__(self, inner, harness: ResearchHarness):
+        self.inner = inner
+        self.harness = harness
+
+    def verify(
+        self,
+        task: ResearchTask,
+        draft: ResearchDraft,
+        evidence_pool: EvidencePool,
+    ) -> EvidenceVerificationResult:
+        result = self.inner.verify(
+            task,
+            draft,
+            evidence_pool,
+        )
+
+        if result.sufficient:
+            self.harness.diagnostics.evidence_insufficient = False
+            self.harness.diagnostics.result_status = "success"
+
+            if (
+                self.harness.diagnostics.error_type is None
+                and not self.harness.diagnostics.provider_failure
+            ):
+                self.harness.diagnostics.error_message = None
+
+        else:
+            self.harness.note_evidence_insufficient(
+                message=result.reason
+            )
+
+        return result
 
 def usage_totals(traces: list[LlmCallTrace]) -> dict[str, Any]:
     prompt = sum(trace.prompt_tokens for trace in traces)
@@ -474,3 +519,4 @@ def _provider_model(client, settings: Settings | None) -> tuple[str, str]:
     else:
         model = str(getattr(client_settings, "ollama_model", "") or "")
     return provider, model
+

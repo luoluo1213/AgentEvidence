@@ -1,12 +1,42 @@
-.venv/
-.venv-win/
-__pycache__/
-*.pyc
+# Environment variables and secrets
 .env
-.uploads/
-data/*.db
-data/*.sqlite
-data/*.xlsx
+.env.*
+!.env.example
+!frontend/.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Local research data and vector indexes
 data/chroma/
-target/
+data/uploads/
+data/research_raw/
+data/research_corpus/
+data/research_normalized/
+
+# Logs and caches
+*.log
+logs/
+.cache/
+
+# Frontend
+node_modules/
+dist/
+coverage/
+.vite/
+
+# IDE and OS
+.vscode/
+.idea/
 .DS_Store
+Thumbs.db

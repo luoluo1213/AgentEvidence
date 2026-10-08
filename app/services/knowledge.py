@@ -272,14 +272,10 @@ class KnowledgeService:
         )
 
     def _chunks_for_corpus(self, corpus: str | None) -> list[KnowledgeChunk]:
-        query = self.db.query(KnowledgeChunk)
-        if corpus == "research":
-            query = query.filter(KnowledgeChunk.source.like("research:%"))
-        elif corpus == "psychology":
-            query = query.filter(~KnowledgeChunk.source.like("research:%"))
-        elif corpus is not None:
+        if corpus not in {None, "research"}:
             raise ValueError(f"Unsupported corpus: {corpus}")
-        return query.all()
+
+        return self.db.query(KnowledgeChunk).all()
 
     def _retrieve_bm25(self, query: str, top_k: int, chunks: list[KnowledgeChunk] | None = None) -> list[SearchResult]:
         chunks = chunks if chunks is not None else self.db.query(KnowledgeChunk).all()
@@ -600,6 +596,24 @@ class KnowledgeService:
         except (TypeError, json.JSONDecodeError):
             return {}
         return value if isinstance(value, dict) else {}
+    
+    def delete_source(self, source: str, *, commit: bool = True) -> int:
+        """Remove one source from Chroma and SQL storage.
+
+        ``commit=False`` lets a caller include the SQL deletion in a wider
+        transaction. Chroma is not transactional, so callers remain
+        responsible for repairing the vector index if that SQL transaction
+        subsequently fails.
+        """
+        self._delete_vector_source(source)
+
+        deleted = self.db.query(KnowledgeChunk).filter(
+            KnowledgeChunk.source == source
+        ).delete()
+
+        if commit:
+            self.db.commit()
+        return int(deleted)
 
 
 def chunk_text(content: str, size: int, overlap: int) -> list[str]:
@@ -783,3 +797,4 @@ def extract_pdf(data: bytes) -> str:
 
     reader = PdfReader(BytesIO(data))
     return "\n".join(page.extract_text() or "" for page in reader.pages)
+

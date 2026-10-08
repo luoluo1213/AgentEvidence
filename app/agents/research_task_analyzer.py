@@ -21,7 +21,7 @@ Your job is to transform a user's question into a structured research task. You 
 
 Classify the task into exactly one supported task type:
 - FACT_LOOKUP: one focused fact or mechanism can be answered from one document or a small amount of evidence.
-- CROSS_DOCUMENT_COMPARISON: the query explicitly compares two or more entities, systems, methods, mechanisms, or sources. This type requires comparison and multiple sources.
+- COMPARISON: the query explicitly compares two or more entities, systems, methods, mechanisms, or sources. This type requires comparison, but it does not necessarily require multiple sources; multiple concepts or mechanisms may be compared within a single source.
 - MULTI_HOP_RESEARCH: the answer requires several intermediate questions or multiple pieces of evidence to be combined.
 - PAPER_REPO_ANALYSIS: the query explicitly asks for joint analysis of a paper and code, GitHub repository, implementation, or README.
 - GENERAL_RESEARCH: use only when the task cannot reliably fit another supported type.
@@ -32,7 +32,7 @@ Break the query into the minimum set of research questions required to answer it
 
 Return only one JSON object with exactly these fields:
 {
-  "task_type": "FACT_LOOKUP|CROSS_DOCUMENT_COMPARISON|MULTI_HOP_RESEARCH|PAPER_REPO_ANALYSIS|GENERAL_RESEARCH",
+  "task_type": "FACT_LOOKUP|COMPARISON|MULTI_HOP_RESEARCH|PAPER_REPO_ANALYSIS|GENERAL_RESEARCH",
   "entities": ["entity"],
   "research_questions": ["question"],
   "expected_source_types": ["paper|repository|documentation|benchmark|other"],
@@ -91,6 +91,7 @@ class TaskAnalyzerAgent:
         task = ResearchTask.model_validate(payload)
         return _normalize_task(task)
 
+
     def _fallback_analysis(self, query: str) -> ResearchTask:
         lowered = query.lower()
         has_paper = _contains_any(lowered, ("论文", "paper"))
@@ -112,9 +113,9 @@ class TaskAnalyzerAgent:
         if has_paper and has_repository:
             task_type = ResearchTaskType.PAPER_REPO_ANALYSIS
             requires_comparison = False
-            requires_multiple_sources = True
+            requires_multiple_sources = _explicitly_requires_multiple_sources(lowered)
         elif is_comparison:
-            task_type = ResearchTaskType.CROSS_DOCUMENT_COMPARISON
+            task_type = ResearchTaskType.COMPARISON
             requires_comparison = True
             requires_multiple_sources = True
         elif is_multi_hop:
@@ -137,6 +138,22 @@ class TaskAnalyzerAgent:
             requires_multiple_sources=requires_multiple_sources,
         )
 
+def _explicitly_requires_multiple_sources(text: str) -> bool:
+    return _contains_any(
+        text,
+        (
+            "两篇论文",
+            "多篇论文",
+            "不同论文",
+            "多个来源",
+            "不同来源",
+            "multiple papers",
+            "multiple sources",
+            "different papers",
+            "different sources",
+            "cross-document",
+        ),
+    )
 
 def _extract_json_object(raw: str) -> dict:
     text = str(raw or "").strip()
@@ -161,9 +178,8 @@ def _normalize_task(task: ResearchTask) -> ResearchTask:
     updates = {}
     if not task.research_questions:
         updates["research_questions"] = [task.query]
-    if task.task_type == ResearchTaskType.CROSS_DOCUMENT_COMPARISON:
+    if task.task_type == ResearchTaskType.COMPARISON:
         updates["requires_comparison"] = True
-        updates["requires_multiple_sources"] = True
     elif task.task_type == ResearchTaskType.PAPER_REPO_ANALYSIS:
         source_types = list(task.expected_source_types)
         for source_type in (ResearchSourceType.PAPER, ResearchSourceType.REPOSITORY):

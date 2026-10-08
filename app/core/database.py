@@ -9,18 +9,27 @@ class Base(DeclarativeBase):
 
 
 settings = get_settings()
+
 engine_kwargs = {
     "pool_pre_ping": True,
     "pool_recycle": 3600,
 }
+
 if settings.database_url.startswith("sqlite"):
-    engine_kwargs["connect_args"] = {"check_same_thread": False}
+    engine_kwargs["connect_args"] = {
+        "check_same_thread": False
+    }
 
 engine = create_engine(
     settings.database_url,
     **engine_kwargs,
 )
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+
+SessionLocal = sessionmaker(
+    bind=engine,
+    autoflush=False,
+    autocommit=False,
+)
 
 
 def get_db():

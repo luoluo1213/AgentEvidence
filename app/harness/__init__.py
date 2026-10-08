@@ -1,2 +1,0 @@
-"""MindBridge engineering harness package."""
-

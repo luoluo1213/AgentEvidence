@@ -214,8 +214,8 @@ class ResearchDraftGenerator:
             if unknown:
                 raise ValueError(f"unknown evidence ids: {sorted(unknown)}")
             cited_ids.update(claim.evidence_ids)
-            if _is_comparison(task):
-                self._validate_comparison_claim(task, claim, evidence_by_id)
+            # if _is_comparison(task):
+            #     self._validate_comparison_claim(task, claim, evidence_by_id)
 
         if _is_comparison(task):
             cited_sources = {evidence_by_id[evidence_id].source_id for evidence_id in cited_ids}
@@ -345,7 +345,7 @@ def _evidence_ids_by_entity(task: ResearchTask, evidence_pool: EvidencePool) -> 
 
 
 def _is_comparison(task: ResearchTask) -> bool:
-    return task.requires_comparison or task.task_type == ResearchTaskType.CROSS_DOCUMENT_COMPARISON
+    return task.requires_comparison or task.task_type == ResearchTaskType.COMPARISON
 
 
 def _contains_chinese(text: str) -> bool:
